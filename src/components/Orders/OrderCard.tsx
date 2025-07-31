@@ -1,12 +1,5 @@
 import { type Order } from '../../store/OrderSlices/orderTypes';
-import {
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Box,
-  Divider,
-} from '@mui/material';
+import { Card, Typography, Chip, Box, Divider } from '@mui/material';
 
 const statusColor = (status: string) => {
   switch (status) {
@@ -30,32 +23,40 @@ const OrderCard = ({ order }: { order: Order }) => {
     <Card
       variant='outlined'
       sx={{
-        height: '100%',
-        transition: '0.2s ease',
+        height: 200,
+        width: '100%',
+        borderRadius: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        transition: 'all 0.2s ease-in-out',
+        p: 2,
+        boxShadow: 1,
         '&:hover': {
           boxShadow: 4,
-          transform: 'translateY(-2px)',
+          transform: 'translateY(-3px)',
         },
       }}
     >
-      <CardContent>
-        <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <Typography variant='subtitle1' fontWeight={600}>
-            {order.customerName}
-          </Typography>
-          <Chip
-            label={order.status}
-            color={statusColor(order.status)}
-            size='small'
-          />
-        </Box>
-
-        <Typography variant='body2' color='text.secondary' gutterBottom>
-          Order ID: {order.id}
+      <Box display='flex' justifyContent='space-between' alignItems='center'>
+        <Typography variant='subtitle1' fontWeight={700}>
+          {order.customerName}
         </Typography>
+        <Chip
+          label={order.status}
+          color={statusColor(order.status)}
+          size='small'
+          sx={{ textTransform: 'capitalize' }}
+        />
+      </Box>
 
-        <Divider sx={{ my: 1 }} />
+      <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
+        Order ID: {order.id}
+      </Typography>
 
+      <Divider sx={{ my: 1 }} />
+
+      <Box>
         <Typography variant='body2'>
           <strong>Total:</strong> ${order.total.toFixed(2)}
         </Typography>
@@ -67,7 +68,7 @@ const OrderCard = ({ order }: { order: Order }) => {
             day: 'numeric',
           })}
         </Typography>
-      </CardContent>
+      </Box>
     </Card>
   );
 };

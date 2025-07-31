@@ -9,7 +9,16 @@ const OrdersList = () => {
   return (
     <Grid container spacing={3}>
       {orders.map((order) => (
-        <Grid item xs={12} sm={6} md={4} lg={3} key={order.id} {...({} as any)}>
+        <Grid
+          item
+          key={order.id}
+          xs={12}
+          sm={6}
+          md={4}
+          lg={3}
+          display='flex'
+          {...({} as any)}
+        >
           <OrderCard order={order} />
         </Grid>
       ))}
