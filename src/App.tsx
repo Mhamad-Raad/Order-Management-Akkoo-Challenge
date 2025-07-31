@@ -1,35 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { type RootState, type AppDispatch } from './store';
+import { loadOrders } from './store/OrderSlices/orderSlice';
+import ordersData from './data/mock-orders.json';
 
-function App() {
-  const [count, setCount] = useState(0)
+import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
+import Layout from './components/Layout/Layout';
+import Dashboard from './pages/Dashboard';
+
+const App = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const mode = useSelector((state: RootState) => state.theme.mode);
+
+  useEffect(() => {
+    dispatch(loadOrders(ordersData.orders));
+  }, [dispatch]);
+
+  const theme = createTheme({
+    palette: {
+      mode,
+    },
+  });
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Layout>
+        <Dashboard />
+      </Layout>
+    </ThemeProvider>
+  );
+};
 
-export default App
+export default App;
+
