@@ -5,7 +5,7 @@ import OrderCard from './OrderCard';
 import OrderModal from './OrderModal';
 import FilterPanel from '../FilterPanel';
 import { type Order } from '../../store/OrderSlices/orderTypes';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 const ORDERS_PER_PAGE = 10;
 
@@ -19,6 +19,8 @@ const OrdersList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dateRange, setDateRange] = useState('all');
   const [amountRange, setAmountRange] = useState<number[]>([0, 1000]);
+  const [customStartDate, setCustomStartDate] = useState<Dayjs | null>(null);
+  const [customEndDate, setCustomEndDate] = useState<Dayjs | null>(null);
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [open, setOpen] = useState(false);
@@ -45,6 +47,15 @@ const OrdersList = () => {
     if (dateRange === 'week') return orderDate.isAfter(now.subtract(7, 'day'));
     if (dateRange === 'month')
       return orderDate.isAfter(now.subtract(1, 'month'));
+    if (dateRange === 'custom') {
+      if (customStartDate && customEndDate) {
+        return (
+          orderDate.isAfter(customStartDate.subtract(1, 'day')) &&
+          orderDate.isBefore(customEndDate.add(1, 'day'))
+        );
+      }
+    }
+
     return true;
   };
 
@@ -67,7 +78,14 @@ const OrdersList = () => {
     const filtered = filterOrders();
     setFilteredOrders(filtered);
     setPage(1);
-  }, [status, searchTerm, dateRange, amountRange]);
+  }, [
+    status,
+    searchTerm,
+    dateRange,
+    amountRange,
+    customStartDate,
+    customEndDate,
+  ]);
 
   useEffect(() => {
     const start = (page - 1) * ORDERS_PER_PAGE;
@@ -88,6 +106,10 @@ const OrdersList = () => {
         onDateRangeChange={setDateRange}
         amountRange={amountRange}
         onAmountChange={setAmountRange}
+        customStartDate={customStartDate}
+        customEndDate={customEndDate}
+        onStartDateChange={setCustomStartDate}
+        onEndDateChange={setCustomEndDate}
       />
 
       <Grid container spacing={3}>
