@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Grid, Pagination, Box } from '@mui/material';
-import ordersData from '../../data/mock-orders.json'; // simulate backend
+import ordersData from '../../data/mock-orders.json';
 import OrderCard from './OrderCard';
 import OrderModal from './OrderModal';
+import FilterPanel from '../FilterPanel';
 import { type Order } from '../../store/OrderSlices/orderTypes';
 
 const ORDERS_PER_PAGE = 10;
 
 const OrdersList = () => {
-  const [allOrders] = useState<Order[]>(ordersData.orders); // mock DB
+  const [allOrders] = useState<Order[]>(ordersData.orders);
+  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [visibleOrders, setVisibleOrders] = useState<Order[]>([]);
   const [page, setPage] = useState(1);
+
+  const [status, setStatus] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [open, setOpen] = useState(false);
@@ -29,16 +34,39 @@ const OrdersList = () => {
     setPage(value);
   };
 
+  const filterOrders = () => {
+    return allOrders.filter((order) => {
+      const matchStatus = status === 'all' || order.status === status;
+      const matchSearch =
+        order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.id.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchStatus && matchSearch;
+    });
+  };
+
+  useEffect(() => {
+    const filtered = filterOrders();
+    setFilteredOrders(filtered);
+    setPage(1); // reset to first page on new filter
+  }, [status, searchTerm, allOrders]);
+
   useEffect(() => {
     const start = (page - 1) * ORDERS_PER_PAGE;
     const end = start + ORDERS_PER_PAGE;
-    setVisibleOrders(allOrders.slice(start, end));
-  }, [page, allOrders]);
+    setVisibleOrders(filteredOrders.slice(start, end));
+  }, [page, filteredOrders]);
 
-  const totalPages = Math.ceil(allOrders.length / ORDERS_PER_PAGE);
+  const totalPages = Math.ceil(filteredOrders.length / ORDERS_PER_PAGE);
 
   return (
     <>
+      <FilterPanel
+        status={status}
+        onStatusChange={setStatus}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+      />
+
       <Grid container spacing={3}>
         {visibleOrders.map((order) => (
           <Grid
