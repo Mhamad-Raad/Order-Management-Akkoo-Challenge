@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Grid, Pagination, Box } from '@mui/material';
+import { Grid, Pagination, Box, Typography } from '@mui/material';
 import ordersData from '../../data/mock-orders.json';
 import OrderCard from './OrderCard';
 import OrderModal from './OrderModal';
@@ -37,6 +37,15 @@ const OrdersList = () => {
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
+  };
+
+  const resetFilters = () => {
+    setStatus('all');
+    setSearchTerm('');
+    setDateRange('all');
+    setAmountRange([0, 1000]);
+    setCustomStartDate(null);
+    setCustomEndDate(null);
   };
 
   const matchesDateRange = (date: string): boolean => {
@@ -112,33 +121,66 @@ const OrdersList = () => {
         onEndDateChange={setCustomEndDate}
       />
 
-      <Grid container spacing={3}>
-        {visibleOrders.map((order) => (
-          <Grid
-            item
-            key={order.id}
-            xs={12}
-            sm={6}
-            md={4}
-            lg={3}
-            display='flex'
-            onClick={() => handleOpen(order)}
-            sx={{ cursor: 'pointer' }}
-            {...({} as any)}
-          >
-            <OrderCard order={order} />
+      {filteredOrders.length > 0 ? (
+        <>
+          <Grid container spacing={3}>
+            {visibleOrders.map((order) => (
+              <Grid
+                item
+                key={order.id}
+                xs={12}
+                sm={6}
+                md={4}
+                lg={3}
+                display='flex'
+                onClick={() => handleOpen(order)}
+                sx={{ cursor: 'pointer' }}
+                {...({} as any)}
+              >
+                <OrderCard order={order} />
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
 
-      <Box mt={4} display='flex' justifyContent='center'>
-        <Pagination
-          count={totalPages}
-          page={page}
-          onChange={handlePageChange}
-          color='primary'
-        />
-      </Box>
+          <Box mt={4} display='flex' justifyContent='center'>
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={handlePageChange}
+              color='primary'
+            />
+          </Box>
+        </>
+      ) : (
+        <Box mt={6} textAlign='center' width='100%'>
+          <Typography variant='h6' gutterBottom>
+            No orders match the selected filters.
+          </Typography>
+          <Typography variant='body2' color='text.secondary' mb={2}>
+            Try adjusting your filters or search terms.
+          </Typography>
+          <Box display='flex' justifyContent='center'>
+            <Box
+              component='button'
+              onClick={resetFilters}
+              sx={{
+                px: 3,
+                py: 1,
+                borderRadius: 2,
+                bgcolor: 'primary.main',
+                color: '#fff',
+                border: 'none',
+                cursor: 'pointer',
+                '&:hover': {
+                  bgcolor: 'primary.dark',
+                },
+              }}
+            >
+              Reset Filters
+            </Box>
+          </Box>
+        </Box>
+      )}
 
       <OrderModal open={open} onClose={handleClose} order={selectedOrder} />
     </>
