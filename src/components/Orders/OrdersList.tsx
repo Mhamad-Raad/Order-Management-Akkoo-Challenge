@@ -4,6 +4,7 @@ import ordersData from '../../data/mock-orders.json';
 import OrderCard from './OrderCard';
 import OrderModal from './OrderModal';
 import FilterPanel from '../FilterPanel';
+import SortBar from '../SortBar';
 import { type Order } from '../../store/OrderSlices/orderTypes';
 import dayjs, { Dayjs } from 'dayjs';
 
@@ -21,6 +22,9 @@ const OrdersList = () => {
   const [amountRange, setAmountRange] = useState<number[]>([0, 1000]);
   const [customStartDate, setCustomStartDate] = useState<Dayjs | null>(null);
   const [customEndDate, setCustomEndDate] = useState<Dayjs | null>(null);
+
+  const [sortBy, setSortBy] = useState('');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [open, setOpen] = useState(false);
@@ -48,6 +52,20 @@ const OrdersList = () => {
     setCustomEndDate(null);
   };
 
+  const handleSortChange = (key: string) => {
+    if (sortBy === key) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(key);
+      setSortDirection('asc');
+    }
+  };
+
+  const resetSorting = () => {
+    setSortBy('');
+    setSortDirection('asc');
+  };
+
   const matchesDateRange = (date: string): boolean => {
     const orderDate = dayjs(date);
     const now = dayjs();
@@ -69,18 +87,48 @@ const OrdersList = () => {
   };
 
   const filterOrders = () => {
-    return allOrders.filter((order) => {
-      const matchStatus = status === 'all' || order.status === status;
-      const matchSearch =
-        order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.id.toLowerCase().includes(searchTerm.toLowerCase());
+    return allOrders
+      .filter((order) => {
+        const matchStatus = status === 'all' || order.status === status;
+        const matchSearch =
+          order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          order.id.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchDate = matchesDateRange(order.orderDate);
-      const matchAmount =
-        order.total >= amountRange[0] && order.total <= amountRange[1];
+        const matchDate = matchesDateRange(order.orderDate);
+        const matchAmount =
+          order.total >= amountRange[0] && order.total <= amountRange[1];
 
-      return matchStatus && matchSearch && matchDate && matchAmount;
-    });
+        return matchStatus && matchSearch && matchDate && matchAmount;
+      })
+      .sort((a, b) => {
+        if (!sortBy) return 0;
+
+        let valA: string | number = '';
+        let valB: string | number = '';
+
+        switch (sortBy) {
+          case 'date':
+            valA = new Date(a.orderDate).getTime();
+            valB = new Date(b.orderDate).getTime();
+            break;
+          case 'amount':
+            valA = a.total;
+            valB = b.total;
+            break;
+          case 'customer':
+            valA = a.customerName.toLowerCase();
+            valB = b.customerName.toLowerCase();
+            break;
+          case 'status':
+            valA = a.status;
+            valB = b.status;
+            break;
+        }
+
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
   };
 
   useEffect(() => {
@@ -94,6 +142,8 @@ const OrdersList = () => {
     amountRange,
     customStartDate,
     customEndDate,
+    sortBy,
+    sortDirection,
   ]);
 
   useEffect(() => {
@@ -119,6 +169,13 @@ const OrdersList = () => {
         customEndDate={customEndDate}
         onStartDateChange={setCustomStartDate}
         onEndDateChange={setCustomEndDate}
+      />
+
+      <SortBar
+        sortBy={sortBy}
+        sortDirection={sortDirection}
+        onSortChange={handleSortChange}
+        onResetSort={resetSorting}
       />
 
       {filteredOrders.length > 0 ? (
