@@ -1,5 +1,15 @@
+import {
+  Card,
+  CardContent,
+  Typography,
+  Checkbox,
+  Chip,
+  Stack,
+} from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleSelectOrder } from '../../store/OrderSlices/orderSlice';
 import { type Order } from '../../store/OrderSlices/orderTypes';
-import { Card, Typography, Chip, Box, Divider } from '@mui/material';
+import { type RootState } from '../../store';
 
 const statusColor = (status: string) => {
   switch (status) {
@@ -19,56 +29,38 @@ const statusColor = (status: string) => {
 };
 
 const OrderCard = ({ order }: { order: Order }) => {
+  const dispatch = useDispatch();
+  const selectedOrders = useSelector(
+    (state: RootState) => state.orders.selectedOrders
+  );
+
   return (
-    <Card
-      variant='outlined'
-      sx={{
-        height: 200,
-        width: '100%',
-        borderRadius: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        transition: 'all 0.2s ease-in-out',
-        p: 2,
-        boxShadow: 1,
-        '&:hover': {
-          boxShadow: 4,
-          transform: 'translateY(-3px)',
-        },
-      }}
-    >
-      <Box display='flex' justifyContent='space-between' alignItems='center'>
-        <Typography variant='subtitle1' fontWeight={700}>
-          {order.customerName}
-        </Typography>
-        <Chip
-          label={order.status}
-          color={statusColor(order.status)}
-          size='small'
-          sx={{ textTransform: 'capitalize' }}
-        />
-      </Box>
-
-      <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
-        Order ID: {order.id}
-      </Typography>
-
-      <Divider sx={{ my: 1 }} />
-
-      <Box>
-        <Typography variant='body2'>
-          <strong>Total:</strong> ${order.total.toFixed(2)}
-        </Typography>
-        <Typography variant='body2'>
-          <strong>Date:</strong>{' '}
-          {new Date(order.orderDate).toLocaleDateString(undefined, {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          })}
-        </Typography>
-      </Box>
+    <Card variant='outlined' sx={{ mb: 2 }}>
+      <CardContent>
+        <Stack
+          direction='row'
+          justifyContent='space-between'
+          alignItems='center'
+        >
+          <Stack direction='row' alignItems='center' spacing={2}>
+            <Checkbox
+              checked={selectedOrders.includes(order.id)}
+              onClick={(e) => e.stopPropagation()}
+              onChange={() => dispatch(toggleSelectOrder(order.id))}
+            />
+            <div>
+              <Typography variant='h6'>{order.customerName}</Typography>
+              <Typography variant='body2' color='text.secondary'>
+                {new Date(order.orderDate).toLocaleString()}
+              </Typography>
+              <Typography variant='body2'>
+                Total: ${order.total.toFixed(2)}
+              </Typography>
+            </div>
+          </Stack>
+          <Chip label={order.status} color={statusColor(order.status)} />
+        </Stack>
+      </CardContent>
     </Card>
   );
 };

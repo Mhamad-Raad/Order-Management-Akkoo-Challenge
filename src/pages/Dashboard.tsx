@@ -1,15 +1,22 @@
-import { Typography, Box } from '@mui/material';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadOrders } from '../store/OrderSlices/orderSlice';
+import ordersData from '../data/mock-orders.json';
+import { type RootState } from '../store';
+
 import OrdersList from '../components/Orders/OrdersList';
 
 const Dashboard = () => {
-  return (
-    <Box>
-      <Typography variant='h5' fontWeight={600} gutterBottom>
-        Orders Overview
-      </Typography>
-      <OrdersList />
-    </Box>
-  );
+  const dispatch = useDispatch();
+  const orders = useSelector((state: RootState) => state.orders.orders);
+
+  useEffect(() => {
+    if (orders.length === 0) {
+      dispatch(loadOrders(ordersData.orders));
+    }
+  }, [dispatch, orders.length]);
+
+  return <OrdersList />;
 };
 
 export default Dashboard;

@@ -1,13 +1,14 @@
-
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Order } from './orderTypes';
+import { type Order } from './orderTypes';
 
-interface OrdersState {
-  data: Order[];
+interface OrderState {
+  orders: Order[];
+  selectedOrders: string[];
 }
 
-const initialState: OrdersState = {
-  data: [],
+const initialState: OrderState = {
+  orders: [],
+  selectedOrders: [],
 };
 
 const orderSlice = createSlice({
@@ -15,19 +16,49 @@ const orderSlice = createSlice({
   initialState,
   reducers: {
     loadOrders: (state, action: PayloadAction<Order[]>) => {
-      state.data = action.payload;
+      state.orders = action.payload;
     },
-    updateOrderStatus: (
+    updateSingleOrderStatus(
       state,
       action: PayloadAction<{ id: string; status: string }>
-    ) => {
-      const order = state.data.find((o) => o.id === action.payload.id);
-      if (order) {
-        order.status = action.payload.status;
+    ) {
+      const { id, status } = action.payload;
+      state.orders = state.orders.map((order) =>
+        order.id === id ? { ...order, status } : order
+      );
+    },
+    toggleSelectOrder(state, action: PayloadAction<string>) {
+      const id = action.payload;
+      if (state.selectedOrders.includes(id)) {
+        state.selectedOrders = state.selectedOrders.filter((i) => i !== id);
+      } else {
+        state.selectedOrders.push(id);
       }
+    },
+    selectAllOrders(state) {
+      state.selectedOrders = state.orders.map((order) => order.id);
+    },
+    deselectAllOrders(state) {
+      state.selectedOrders = [];
+    },
+    bulkUpdateStatus(state, action: PayloadAction<string>) {
+      const newStatus = action.payload;
+      state.orders = state.orders.map((order) =>
+        state.selectedOrders.includes(order.id)
+          ? { ...order, status: newStatus }
+          : order
+      );
     },
   },
 });
 
-export const { loadOrders, updateOrderStatus } = orderSlice.actions;
+export const {
+  loadOrders,
+  updateSingleOrderStatus,
+  toggleSelectOrder,
+  selectAllOrders,
+  deselectAllOrders,
+  bulkUpdateStatus,
+} = orderSlice.actions;
+
 export default orderSlice.reducer;

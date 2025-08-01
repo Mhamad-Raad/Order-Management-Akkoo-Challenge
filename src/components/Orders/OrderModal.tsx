@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { updateOrderStatus } from '../../store/OrderSlices/orderSlice';
+import { updateSingleOrderStatus, } from '../../store/OrderSlices/orderSlice';
 import { type Order } from '../../store/OrderSlices/orderTypes';
 
 const statusColor = (status: string) => {
@@ -54,7 +54,7 @@ const OrderModal = ({ open, onClose, order }: Props) => {
 
   const handleStatusChange = (newStatus: string) => {
     setLocalStatus(newStatus);
-    dispatch(updateOrderStatus({ id: order.id, status: newStatus }));
+    dispatch(updateSingleOrderStatus({ id: order.id, status: newStatus }));
 
     // OPTIONAL: simulate updating mock-orders.json by logging
     console.log(`Order ${order.id} status updated to ${newStatus}`);
