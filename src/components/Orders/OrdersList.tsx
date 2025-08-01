@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Grid, Pagination, Box, Typography } from '@mui/material';
+import { useSelector, useDispatch } from 'react-redux';
+import { type RootState } from '../../store';
+import { loadOrders } from '../../store/OrderSlices/orderSlice';
 import ordersData from '../../data/mock-orders.json';
 import OrderCard from './OrderCard';
 import OrderModal from './OrderModal';
@@ -11,7 +14,9 @@ import dayjs, { Dayjs } from 'dayjs';
 const ORDERS_PER_PAGE = 10;
 
 const OrdersList = () => {
-  const [allOrders] = useState<Order[]>(ordersData.orders);
+  const dispatch = useDispatch();
+  const allOrders = useSelector((state: RootState) => state.orders.data);
+
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [visibleOrders, setVisibleOrders] = useState<Order[]>([]);
   const [page, setPage] = useState(1);
@@ -132,10 +137,18 @@ const OrdersList = () => {
   };
 
   useEffect(() => {
+    // Load from JSON only once
+    if (allOrders.length === 0) {
+      dispatch(loadOrders(ordersData.orders));
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
     const filtered = filterOrders();
     setFilteredOrders(filtered);
     setPage(1);
   }, [
+    allOrders,
     status,
     searchTerm,
     dateRange,

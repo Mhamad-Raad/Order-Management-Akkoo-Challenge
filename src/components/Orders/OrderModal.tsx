@@ -9,7 +9,14 @@ import {
   List,
   ListItem,
   ListItemText,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { updateOrderStatus } from '../../store/OrderSlices/orderSlice';
 import { type Order } from '../../store/OrderSlices/orderTypes';
 
 const statusColor = (status: string) => {
@@ -36,7 +43,22 @@ interface Props {
 }
 
 const OrderModal = ({ open, onClose, order }: Props) => {
+  const dispatch = useDispatch();
+  const [localStatus, setLocalStatus] = useState(order?.status ?? '');
+
+  useEffect(() => {
+    setLocalStatus(order?.status ?? '');
+  }, [order]);
+
   if (!order) return null;
+
+  const handleStatusChange = (newStatus: string) => {
+    setLocalStatus(newStatus);
+    dispatch(updateOrderStatus({ id: order.id, status: newStatus }));
+
+    // OPTIONAL: simulate updating mock-orders.json by logging
+    console.log(`Order ${order.id} status updated to ${newStatus}`);
+  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
@@ -44,8 +66,8 @@ const OrderModal = ({ open, onClose, order }: Props) => {
         <Box display='flex' justifyContent='space-between' alignItems='center'>
           <Typography variant='h6'>{order.customerName}</Typography>
           <Chip
-            label={order.status}
-            color={statusColor(order.status)}
+            label={localStatus}
+            color={statusColor(localStatus)}
             size='small'
           />
         </Box>
@@ -67,6 +89,26 @@ const OrderModal = ({ open, onClose, order }: Props) => {
             day: 'numeric',
           })}
         </Typography>
+
+        <Divider sx={{ my: 2 }} />
+
+        <Typography variant='subtitle1' gutterBottom>
+          Update Status
+        </Typography>
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <InputLabel>Status</InputLabel>
+          <Select
+            value={localStatus}
+            label='Status'
+            onChange={(e) => handleStatusChange(e.target.value)}
+          >
+            <MenuItem value='pending'>Pending</MenuItem>
+            <MenuItem value='processing'>Processing</MenuItem>
+            <MenuItem value='shipped'>Shipped</MenuItem>
+            <MenuItem value='delivered'>Delivered</MenuItem>
+            <MenuItem value='cancelled'>Cancelled</MenuItem>
+          </Select>
+        </FormControl>
 
         <Divider sx={{ my: 2 }} />
 
