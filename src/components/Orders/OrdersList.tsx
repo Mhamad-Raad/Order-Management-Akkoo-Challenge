@@ -13,6 +13,7 @@ import OrderModal from './OrderModal';
 import FilterPanel from '../FilterPanel';
 import SortBar from '../SortBar';
 import ExportCSVButton from '../ExportCSVButton';
+import OrderSummary from './OrdersSummary';
 
 import { type Order } from '../../store/OrderSlices/orderTypes';
 
@@ -245,6 +246,8 @@ const OrdersList = () => {
       />
 
       <BulkActions />
+
+      <OrderSummary />
 
       {filteredOrders.length > 0 ? (
         <>
