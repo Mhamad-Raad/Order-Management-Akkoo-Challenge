@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Grid, Pagination, Box, Typography } from '@mui/material';
 import { type RootState } from '../../store';
 import { useSnackbar } from 'notistack';
+import dayjs, { Dayjs } from 'dayjs';
 
 import { loadOrders } from '../../store/OrderSlices/orderSlice';
 
@@ -11,8 +12,9 @@ import OrderCard from './OrderCard';
 import OrderModal from './OrderModal';
 import FilterPanel from '../FilterPanel';
 import SortBar from '../SortBar';
+import ExportCSVButton from '../ExportCSVButton';
+
 import { type Order } from '../../store/OrderSlices/orderTypes';
-import dayjs, { Dayjs } from 'dayjs';
 
 const ORDERS_PER_PAGE = 10;
 
@@ -230,6 +232,9 @@ const OrdersList = () => {
         customEndDate={customEndDate}
         onStartDateChange={setCustomStartDate}
         onEndDateChange={setCustomEndDate}
+      />
+      <ExportCSVButton
+        orders={filteredOrders.length > 0 ? filteredOrders : allOrders}
       />
 
       <SortBar
