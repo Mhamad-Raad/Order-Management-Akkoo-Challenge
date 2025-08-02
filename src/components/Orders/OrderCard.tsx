@@ -34,6 +34,13 @@ const OrderCard = ({ order }: { order: Order }) => {
     (state: RootState) => state.orders.selectedOrders
   );
 
+  const isSelected = selectedOrders.includes(order.id);
+
+  const handleCheckboxClick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    dispatch(toggleSelectOrder(order.id));
+  };
+
   return (
     <Card variant='outlined' sx={{ mb: 2 }}>
       <CardContent>
@@ -43,11 +50,7 @@ const OrderCard = ({ order }: { order: Order }) => {
           alignItems='center'
         >
           <Stack direction='row' alignItems='center' spacing={2}>
-            <Checkbox
-              checked={selectedOrders.includes(order.id)}
-              onClick={(e) => e.stopPropagation()}
-              onChange={() => dispatch(toggleSelectOrder(order.id))}
-            />
+            <Checkbox checked={isSelected} onChange={handleCheckboxClick} />
             <div>
               <Typography variant='h6'>{order.customerName}</Typography>
               <Typography variant='body2' color='text.secondary'>

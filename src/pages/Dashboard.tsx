@@ -4,7 +4,7 @@ import { loadOrders } from '../store/OrderSlices/orderSlice';
 import ordersData from '../data/mock-orders.json';
 import { type RootState } from '../store';
 
-import OrdersList from '../components/Orders/OrdersList';
+import OrderBoard from '../components/Orders/OrderBoard';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -16,7 +16,7 @@ const Dashboard = () => {
     }
   }, [dispatch, orders.length]);
 
-  return <OrdersList />;
+  return <OrderBoard />;
 };
 
 export default Dashboard;

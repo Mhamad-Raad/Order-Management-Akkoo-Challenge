@@ -1,0 +1,63 @@
+import { Paper, Typography, Pagination, Stack } from '@mui/material';
+import { useState } from 'react';
+import DraggableOrderCard from './DraggableOrderCard';
+import { useDroppable } from '@dnd-kit/core';
+import { type Order } from '../../store/OrderSlices/orderTypes';
+
+interface Props {
+  status: string;
+  orders: Order[];
+}
+
+const StatusColumn = ({ status, orders }: Props) => {
+  const { setNodeRef: setDropRef } = useDroppable({
+    id: status,
+  });
+
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const paginated = orders.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
+
+  return (
+    <Paper
+      ref={setDropRef}
+      elevation={3}
+      sx={{
+        p: 2,
+        minHeight: '75vh',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
+        bgcolor: 'background.paper',
+      }}
+    >
+      <Typography
+        variant='subtitle1'
+        fontWeight={600}
+        textTransform='capitalize'
+        sx={{ textAlign: 'center' }}
+      >
+        {status} ({orders.length})
+      </Typography>
+
+      {paginated.map((order) => (
+        <DraggableOrderCard key={order.id} order={order} />
+      ))}
+
+      <Stack direction='row' justifyContent='center' sx={{ mt: 'auto' }}>
+        <Pagination
+          count={totalPages}
+          page={page}
+          onChange={(_, val) => setPage(val)}
+          size='small'
+        />
+      </Stack>
+    </Paper>
+  );
+};
+
+export default StatusColumn;

@@ -35,8 +35,10 @@ const orderSlice = createSlice({
         state.selectedOrders.push(id);
       }
     },
-    selectAllOrders(state) {
-      state.selectedOrders = state.orders.map((order) => order.id);
+    selectAllOrders(state, action: PayloadAction<string[]>) {
+      state.selectedOrders = Array.from(
+        new Set([...state.selectedOrders, ...action.payload])
+      );
     },
     deselectAllOrders(state) {
       state.selectedOrders = [];

@@ -9,26 +9,33 @@ import {
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSnackbar } from 'notistack';
-
 import {
-  selectAllOrders,
-  deselectAllOrders,
   bulkUpdateStatus,
+  deselectAllOrders,
+  selectAllOrders,
 } from '../store/OrderSlices/orderSlice';
 import { type RootState } from '../store';
+import { type Order } from '../store/OrderSlices/orderTypes';
 
-const BulkActions = () => {
+interface Props {
+  orders: Order[];
+}
+
+const BulkActions = ({ orders }: Props) => {
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
 
   const selectedOrders = useSelector(
     (state: RootState) => state.orders.selectedOrders
   );
-  const hasSelection = selectedOrders.length > 0;
+
+  const visibleSelected = selectedOrders.filter((id) =>
+    orders.some((o) => o.id === id)
+  );
 
   const handleBulkUpdate = (status: string) => {
     dispatch(bulkUpdateStatus(status));
-    enqueueSnackbar(`Updated ${selectedOrders.length} orders to ${status}`, {
+    enqueueSnackbar(`Updated ${visibleSelected.length} orders to ${status}`, {
       variant: 'success',
     });
   };
@@ -38,15 +45,13 @@ const BulkActions = () => {
       display='flex'
       alignItems='center'
       justifyContent='space-between'
-      mb={2}
-      flexWrap='wrap'
-      gap={2}
+      mb={1}
     >
       <Stack direction='row' spacing={1}>
         <Button
           variant='outlined'
           size='small'
-          onClick={() => dispatch(selectAllOrders())}
+          onClick={() => dispatch(selectAllOrders(orders.map((o) => o.id)))}
         >
           Select All
         </Button>
@@ -63,7 +68,7 @@ const BulkActions = () => {
         <InputLabel>Update Status</InputLabel>
         <Select
           label='Update Status'
-          disabled={!hasSelection}
+          disabled={visibleSelected.length === 0}
           onChange={(e) => handleBulkUpdate(e.target.value)}
           defaultValue=''
         >
