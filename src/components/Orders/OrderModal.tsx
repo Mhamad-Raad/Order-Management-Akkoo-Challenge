@@ -16,8 +16,10 @@ import {
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { updateSingleOrderStatus, } from '../../store/OrderSlices/orderSlice';
+import { updateSingleOrderStatus } from '../../store/OrderSlices/orderSlice';
 import { type Order } from '../../store/OrderSlices/orderTypes';
+
+import { useSnackbar } from 'notistack';
 
 const statusColor = (status: string) => {
   switch (status) {
@@ -43,6 +45,7 @@ interface Props {
 }
 
 const OrderModal = ({ open, onClose, order }: Props) => {
+  const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
   const [localStatus, setLocalStatus] = useState(order?.status ?? '');
 
@@ -54,10 +57,12 @@ const OrderModal = ({ open, onClose, order }: Props) => {
 
   const handleStatusChange = (newStatus: string) => {
     setLocalStatus(newStatus);
+
     dispatch(updateSingleOrderStatus({ id: order.id, status: newStatus }));
 
-    // OPTIONAL: simulate updating mock-orders.json by logging
-    console.log(`Order ${order.id} status updated to ${newStatus}`);
+    enqueueSnackbar(`Order ${order.id} status updated to ${newStatus}`, {
+      variant: 'success',
+    });
   };
 
   return (

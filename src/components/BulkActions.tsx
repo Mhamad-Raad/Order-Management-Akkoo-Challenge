@@ -8,6 +8,8 @@ import {
   Stack,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
+import { useSnackbar } from 'notistack';
+
 import {
   selectAllOrders,
   deselectAllOrders,
@@ -16,7 +18,9 @@ import {
 import { type RootState } from '../store';
 
 const BulkActions = () => {
+  const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
+
   const selectedOrders = useSelector(
     (state: RootState) => state.orders.selectedOrders
   );
@@ -24,6 +28,9 @@ const BulkActions = () => {
 
   const handleBulkUpdate = (status: string) => {
     dispatch(bulkUpdateStatus(status));
+    enqueueSnackbar(`Updated ${selectedOrders.length} orders to ${status}`, {
+      variant: 'success',
+    });
   };
 
   return (
