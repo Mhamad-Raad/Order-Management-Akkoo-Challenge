@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Grid, Pagination, Box, Typography } from '@mui/material';
-import { useSelector } from 'react-redux';
 import { type RootState } from '../../store';
+import { useSnackbar } from 'notistack';
+
+import { loadOrders } from '../../store/OrderSlices/orderSlice';
 
 import BulkActions from '../BulkActions';
 import OrderCard from './OrderCard';
@@ -14,6 +17,9 @@ import dayjs, { Dayjs } from 'dayjs';
 const ORDERS_PER_PAGE = 10;
 
 const OrdersList = () => {
+  const { enqueueSnackbar } = useSnackbar();
+  const [shouldResetPage, setShouldResetPage] = useState(true);
+  const dispatch = useDispatch();
   const allOrders = useSelector((state: RootState) => state.orders.orders);
 
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
@@ -32,6 +38,53 @@ const OrdersList = () => {
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (Math.random() < 0.5) {
+        const newOrder: Order = {
+          id: crypto.randomUUID(),
+          customerName: 'Random User ' + Math.floor(Math.random() * 1000),
+          customerEmail: 'random@example.com',
+          customerPhone: '+1234567890',
+          orderDate: new Date().toISOString(),
+          status: 'pending',
+          total: Math.floor(Math.random() * 500 + 50),
+          items: [],
+          shippingAddress: {
+            street: 'Random St',
+            city: 'City',
+            state: 'State',
+            zipCode: '00000',
+            country: 'Country',
+          },
+        };
+        setShouldResetPage(false);
+        dispatch(loadOrders([...allOrders, newOrder]));
+        enqueueSnackbar(`New order from ${newOrder.customerName}`, {
+          variant: 'success',
+        });
+      } else if (allOrders.length > 0) {
+        const index = Math.floor(Math.random() * allOrders.length);
+        const orderToUpdate = allOrders[index];
+
+        const statuses = ['pending', 'processing', 'shipped', 'delivered'];
+        const newStatus = statuses[Math.floor(Math.random() * statuses.length)];
+
+        const updatedOrders = allOrders.map((order, i) =>
+          i === index ? { ...order, status: newStatus } : order
+        );
+        setShouldResetPage(false);
+        dispatch(loadOrders(updatedOrders));
+        enqueueSnackbar(
+          `Order ${orderToUpdate.id} status changed to ${newStatus}`,
+          { variant: 'info' }
+        );
+      }
+    }, 10000 + Math.random() * 5000);
+
+    return () => clearInterval(interval);
+  }, [allOrders, dispatch]);
 
   const handleOpen = (order: Order) => {
     setSelectedOrder(order);
@@ -138,7 +191,10 @@ const OrdersList = () => {
   useEffect(() => {
     const filtered = filterOrders();
     setFilteredOrders(filtered);
-    setPage(1);
+    if (shouldResetPage) {
+      setPage(1);
+    }
+    setShouldResetPage(true);
   }, [
     allOrders,
     status,
