@@ -62,13 +62,13 @@ const OrderSummary = () => {
                 isDark ? theme.palette.divider : 'rgba(25, 118, 210, 0.25)' // light blue border in light mode
               }`,
               boxShadow: isDark
-                ? `0 8px 32px rgba(0,0,0,0.4)`
+                ? `0 8px 32px rgba(32, 25, 49, 0.4)`
                 : `0 8px 32px rgba(25, 118, 210, 0.1)`,
               transition: 'transform 0.3s ease, box-shadow 0.3s ease',
               '&:hover': {
                 transform: 'translateY(-5px)',
                 boxShadow: isDark
-                  ? `0 12px 40px rgba(0,0,0,0.6)`
+                  ? `0 12px 40px rgba(65, 39, 82, 0.6)`
                   : `0 12px 40px rgba(25, 118, 210, 0.25)`,
                 borderColor: isDark
                   ? theme.palette.primary.main
