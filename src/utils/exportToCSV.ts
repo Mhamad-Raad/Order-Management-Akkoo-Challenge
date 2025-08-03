@@ -1,5 +1,6 @@
 import { type Order } from '../types/orderTypes';
 
+// save a list of orders to a CSV file
 export const exportOrdersToCSV = (orders: Order[]) => {
   if (orders.length === 0) return;
 
