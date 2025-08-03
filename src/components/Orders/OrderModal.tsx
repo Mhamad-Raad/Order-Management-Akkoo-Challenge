@@ -55,6 +55,22 @@ const OrderModal = ({ open, onClose, order }: Props) => {
 
   if (!order) return null;
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (open) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open, onClose]);
+
   const handleStatusChange = (newStatus: string) => {
     setLocalStatus(newStatus);
 
