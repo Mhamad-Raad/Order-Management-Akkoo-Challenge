@@ -1,7 +1,7 @@
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import ordersData from '../data/mock-orders.json';
-import { type Order } from '../store/OrderSlices/orderTypes';
+import { type Order } from '../types/orderTypes';
 
 const uploadMockOrders = async () => {
   const orders: Order[] = (ordersData as any).orders;

@@ -1,4 +1,4 @@
-import { type Order } from '../store/OrderSlices/orderTypes';
+import { type Order } from '../types/orderTypes';
 
 export const exportOrdersToCSV = (orders: Order[]) => {
   if (orders.length === 0) return;

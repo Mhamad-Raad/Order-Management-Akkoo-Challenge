@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Button } from '@mui/material';
 import { Download } from '@mui/icons-material';
 
-import { type Order } from '../store/OrderSlices/orderTypes';
+import { type Order } from '../types/orderTypes';
 
 import { exportOrdersToCSV } from '../utils/exportToCSV';
 

@@ -17,7 +17,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { updateSingleOrderStatus } from '../../store/OrderSlices/orderSlice';
-import { type Order } from '../../store/OrderSlices/orderTypes';
+import { type Order } from '../../types/orderTypes';
 
 import { useSnackbar } from 'notistack';
 

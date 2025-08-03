@@ -14,7 +14,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { useMemo, useState, useEffect } from 'react';
-import { type Order } from '../../store/OrderSlices/orderTypes';
+import { type Order } from '../../types/orderTypes';
 import OrderCard from './OrderCard';
 import dayjs, { Dayjs } from 'dayjs';
 import {

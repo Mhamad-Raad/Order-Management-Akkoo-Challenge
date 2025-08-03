@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { loadOrders } from '../store/OrderSlices/orderSlice';
 import { subscribeToOrders } from '../utils/ordersFirestore';
 
-import { type Order } from '../store/OrderSlices/orderTypes';
+import { type Order } from '../types/orderTypes';
 
 import OrderBoard from '../components/Orders/OrderBoard';
 import OrderModal from '../components/Orders/OrderModal';

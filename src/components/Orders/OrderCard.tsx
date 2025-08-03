@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleSelectOrder } from '../../store/OrderSlices/orderSlice';
-import { type Order } from '../../store/OrderSlices/orderTypes';
+import { type Order } from '../../types/orderTypes';
 import { type RootState } from '../../store';
 
 const statusColor = (status: string) => {

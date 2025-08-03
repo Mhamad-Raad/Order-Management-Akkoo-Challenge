@@ -2,7 +2,7 @@ import { Paper, Typography, Pagination, Stack } from '@mui/material';
 import { useState } from 'react';
 import DraggableOrderCard from './DraggableOrderCard';
 import { useDroppable } from '@dnd-kit/core';
-import { type Order } from '../../store/OrderSlices/orderTypes';
+import { type Order } from '../../types/orderTypes';
 
 interface Props {
   status: string;

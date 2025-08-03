@@ -5,7 +5,7 @@ import {
   type DocumentData,
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { type Order } from '../store/OrderSlices/orderTypes';
+import { type Order } from '../types/orderTypes';
 
 export const subscribeToOrders = (onUpdate: (orders: Order[]) => void) => {
   const ordersRef = collection(db, 'orders');

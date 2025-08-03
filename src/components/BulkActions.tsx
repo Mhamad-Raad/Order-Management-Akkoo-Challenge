@@ -15,7 +15,7 @@ import {
   selectAllOrders,
 } from '../store/OrderSlices/orderSlice';
 import { type RootState } from '../store';
-import { type Order } from '../store/OrderSlices/orderTypes';
+import { type Order } from '../types/orderTypes';
 import { useState } from 'react';
 
 interface Props {

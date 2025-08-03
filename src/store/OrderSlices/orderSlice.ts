@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { type Order } from './orderTypes';
+import { type Order } from '../../types/orderTypes';
 
 interface OrderState {
   orders: Order[];

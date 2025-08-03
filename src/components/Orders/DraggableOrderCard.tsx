@@ -1,7 +1,7 @@
 import { useDraggable } from '@dnd-kit/core';
 import { Box } from '@mui/material';
 import OrderCard from './OrderCard';
-import { type Order } from '../../store/OrderSlices/orderTypes';
+import { type Order } from '../../types/orderTypes';
 
 interface Props {
   order: Order;
