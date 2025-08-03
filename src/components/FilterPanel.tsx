@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type SetStateAction, type Dispatch } from 'react';
 import { Box, TextField, MenuItem, Slider, Typography } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { Dayjs } from 'dayjs';
@@ -6,21 +6,24 @@ import { Dayjs } from 'dayjs';
 import {
   STATUS_OPTIONS as statusOptions,
   DATE_RANGE_OPTIONS as dateOptions,
+  type OrderStatus ,
 } from '../constants';
 
 interface Props {
   status: string;
-  onStatusChange: (value: string) => void;
+  onStatusChange: Dispatch<SetStateAction<'all' | OrderStatus >>;
   searchTerm: string;
-  onSearchChange: (value: string) => void;
-  dateRange: string;
-  onDateRangeChange: (value: string) => void;
-  amountRange: number[];
-  onAmountChange: (value: number[]) => void;
+  onSearchChange: Dispatch<SetStateAction<string>>;
+  dateRange: 'all' | 'today' | 'week' | 'month' | 'custom';
+  onDateRangeChange: Dispatch<
+    SetStateAction<'all' | 'today' | 'week' | 'month' | 'custom'>
+  >;
+  amountRange: [number, number];
+  onAmountChange: Dispatch<SetStateAction<[number, number]>>;
   customStartDate: Dayjs | null;
   customEndDate: Dayjs | null;
-  onStartDateChange: (value: Dayjs | null) => void;
-  onEndDateChange: (value: Dayjs | null) => void;
+  onStartDateChange: Dispatch<SetStateAction<Dayjs | null>>;
+  onEndDateChange: Dispatch<SetStateAction<Dayjs | null>>;
 }
 
 const FilterPanel = ({
@@ -68,7 +71,7 @@ const FilterPanel = ({
         select
         label='Status'
         value={status}
-        onChange={(e) => onStatusChange(e.target.value)}
+        onChange={(e) => onStatusChange(e.target.value as 'all' | OrderStatus )}
         sx={{ minWidth: 150 }}
       >
         {statusOptions.map((option) => (
@@ -82,7 +85,11 @@ const FilterPanel = ({
         select
         label='Date'
         value={dateRange}
-        onChange={(e) => onDateRangeChange(e.target.value)}
+        onChange={(e) =>
+          onDateRangeChange(
+            e.target.value as 'all' | 'today' | 'week' | 'month' | 'custom'
+          )
+        }
         sx={{ minWidth: 150 }}
       >
         {dateOptions.map((option) => (
@@ -129,7 +136,9 @@ const FilterPanel = ({
         </Box>
         <Slider
           value={amountRange}
-          onChange={(_, newValue) => onAmountChange(newValue as number[])}
+          onChange={(_, newValue) =>
+            onAmountChange(newValue as [number, number])
+          }
           valueLabelDisplay='auto'
           min={0}
           max={2000}

@@ -1,93 +1,88 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { useSnackbar } from 'notistack';
-import OrderSummary from './OrdersSummary';
-import isBetween from 'dayjs/plugin/isBetween';
-import { type RootState } from '../../store';
-import { Grid, Typography, Button } from '@mui/material';
-import StatusColumn from './StatusColumn';
+import { Typography, Button } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import { useDispatch, useSelector } from 'react-redux';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import {
+  useSensor,
+  useSensors,
+  MouseSensor,
   DndContext,
   closestCenter,
   DragOverlay,
-  MouseSensor,
-  useSensor,
-  useSensors,
 } from '@dnd-kit/core';
-import { useMemo, useState, useEffect } from 'react';
-import { type Order } from '../../types/orderTypes';
-import OrderCard from './OrderCard';
+import { useSnackbar } from 'notistack';
 import dayjs, { Dayjs } from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+
+import { type RootState } from '../../store';
+import { type Order } from '../../types/orderTypes';
 import {
   loadOrders,
   updateSingleOrderStatus,
 } from '../../store/OrderSlices/orderSlice';
 
+import OrderSummary from './OrdersSummary';
 import ExportCSVButton from '../ExportCSVButton';
 import FilterPanel from '../FilterPanel';
 import SortBar from '../SortBar';
 import BulkActions from '../BulkActions';
-
+import StatusColumn from './StatusColumn';
+import OrderCard from './OrderCard';
 import { generateId } from '../../utils/generateId';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
+import {
+  STATUS_OPTIONS,
+  DATE_RANGE_OPTIONS,
+  type OrderStatus ,
+  type SortKey,
+} from '../../constants';
 
 dayjs.extend(isBetween);
-
-const statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 
 interface Props {
   openModal: (order: Order) => void;
 }
 
 const OrderBoard = ({ openModal }: Props) => {
-  const orders = useSelector((state: RootState) => state.orders.orders);
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
+  const orders = useSelector((state: RootState) => state.orders.orders);
+
+  const ordersRef = useRef(orders);
+  useEffect(() => {
+    ordersRef.current = orders;
+  }, [orders]);
 
   const [activeOrder, setActiveOrder] = useState<Order | null>(null);
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | OrderStatus >('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
-  const [dateRange, setDateRange] = useState('all');
-  const [amountRange, setAmountRange] = useState([0, 2000]);
+  const [dateRange, setDateRange] =
+    useState<(typeof DATE_RANGE_OPTIONS)[number]>('all');
+  const [amountRange, setAmountRange] = useState<[number, number]>([0, 2000]);
   const [customStartDate, setCustomStartDate] = useState<Dayjs | null>(null);
   const [customEndDate, setCustomEndDate] = useState<Dayjs | null>(null);
-  const [sortBy, setSortBy] = useState('');
+  const [sortBy, setSortBy] = useState<SortKey | ''>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const handleDragStart = (event: any) => {
-    const { active } = event;
-    const draggedOrder = orders.find((o) => o.id === active.id);
-    if (draggedOrder) setActiveOrder(draggedOrder);
-  };
+  const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
+  const statuses = useMemo(() => STATUS_OPTIONS.slice(1), []);
 
-  const handleDragEnd = (event: any) => {
-    const { active, over } = event;
-    setActiveOrder(null);
-    if (!over || !active) return;
-    const fromId = active.id;
-    const toStatus = over.id;
-    if (fromId && toStatus && active.data.current?.status !== toStatus) {
-      dispatch(updateSingleOrderStatus({ id: fromId, status: toStatus }));
-      enqueueSnackbar(`Order ${fromId} moved to ${toStatus}`, {
-        variant: 'success',
-      });
-    }
-  };
-
-  const mouseSensor = useSensor(MouseSensor, {
-    activationConstraint: {
-      delay: 150,
-      tolerance: 5,
-    },
-  });
-
-  const sensors = useSensors(mouseSensor);
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        delay: 150,
+        tolerance: 5,
+      },
+    })
+  );
 
   const filteredOrders = useMemo(() => {
     let result = [...orders];
+
     if (statusFilter !== 'all') {
       result = result.filter((o) => o.status === statusFilter);
     }
+
     if (debouncedSearchTerm) {
       const term = debouncedSearchTerm.toLowerCase();
       result = result.filter(
@@ -96,55 +91,76 @@ const OrderBoard = ({ openModal }: Props) => {
           o.id.toLowerCase().includes(term)
       );
     }
-    if (dateRange === 'today') {
-      result = result.filter((o) => dayjs(o.orderDate).isSame(dayjs(), 'day'));
-    } else if (dateRange === 'week') {
-      result = result.filter((o) =>
-        dayjs(o.orderDate).isAfter(dayjs().subtract(7, 'days'))
-      );
-    } else if (dateRange === 'month') {
-      result = result.filter((o) =>
-        dayjs(o.orderDate).isAfter(dayjs().subtract(1, 'month'))
-      );
-    } else if (dateRange === 'custom' && customStartDate && customEndDate) {
-      result = result.filter((o) =>
-        dayjs(o.orderDate).isBetween(
-          customStartDate,
-          customEndDate,
-          'day',
-          '[]'
-        )
-      );
+
+    switch (dateRange) {
+      case 'today':
+        result = result.filter((o) =>
+          dayjs(o.orderDate).isSame(dayjs(), 'day')
+        );
+        break;
+      case 'week':
+        result = result.filter((o) =>
+          dayjs(o.orderDate).isAfter(dayjs().subtract(7, 'days'))
+        );
+        break;
+      case 'month':
+        result = result.filter((o) =>
+          dayjs(o.orderDate).isAfter(dayjs().subtract(1, 'month'))
+        );
+        break;
+      case 'custom':
+        if (customStartDate && customEndDate) {
+          result = result.filter((o) =>
+            dayjs(o.orderDate).isBetween(
+              customStartDate,
+              customEndDate,
+              'day',
+              '[]'
+            )
+          );
+        }
+        break;
     }
+
     result = result.filter(
       (o) => o.total >= amountRange[0] && o.total <= amountRange[1]
     );
+
     if (sortBy) {
-      result = result.sort((a, b) => {
-        let valA: any, valB: any;
-        if (sortBy === 'date') {
-          valA = new Date(a.orderDate).getTime();
-          valB = new Date(b.orderDate).getTime();
-        } else if (sortBy === 'amount') {
-          valA = a.total;
-          valB = b.total;
-        } else if (sortBy === 'customer') {
-          valA = a.customerName.toLowerCase();
-          valB = b.customerName.toLowerCase();
-        } else if (sortBy === 'status') {
-          valA = a.status;
-          valB = b.status;
+      result.sort((a, b) => {
+        let valA: string | number = '';
+        let valB: string | number = '';
+
+        switch (sortBy) {
+          case 'date':
+            valA = new Date(a.orderDate).getTime();
+            valB = new Date(b.orderDate).getTime();
+            break;
+          case 'amount':
+            valA = a.total;
+            valB = b.total;
+            break;
+          case 'customer':
+            valA = a.customerName.toLowerCase();
+            valB = b.customerName.toLowerCase();
+            break;
+          case 'status':
+            valA = a.status;
+            valB = b.status;
+            break;
         }
+
         if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
         if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
         return 0;
       });
     }
+
     return result;
   }, [
     orders,
     statusFilter,
-    searchTerm,
+    debouncedSearchTerm,
     dateRange,
     amountRange,
     customStartDate,
@@ -165,7 +181,9 @@ const OrderBoard = ({ openModal }: Props) => {
           1000000000 + Math.random() * 9000000000
         )}`,
         orderDate: new Date().toISOString(),
-        status: statuses[Math.floor(Math.random() * statuses.length)],
+        status: statuses[
+          Math.floor(Math.random() * statuses.length)
+        ] as OrderStatus ,
         items: [
           {
             id: `item_${Math.floor(Math.random() * 1000)}`,
@@ -190,16 +208,21 @@ const OrderBoard = ({ openModal }: Props) => {
         0
       );
 
-      dispatch(loadOrders([...orders, newOrder]));
+      dispatch(loadOrders([...ordersRef.current, newOrder]));
       enqueueSnackbar(`New order from ${newOrder.customerName}`, {
         variant: 'info',
       });
-    }, 10000 + Math.random() * 5000);
+    }, 12000);
 
     const statusChangeInterval = setInterval(() => {
-      if (orders.length === 0) return;
-      const randomOrder = orders[Math.floor(Math.random() * orders.length)];
-      const newStatus = statuses[Math.floor(Math.random() * statuses.length)];
+      const current = ordersRef.current;
+      if (!current.length) return;
+
+      const randomOrder = current[Math.floor(Math.random() * current.length)];
+      const newStatus = statuses[
+        Math.floor(Math.random() * statuses.length)
+      ] as OrderStatus ;
+
       if (randomOrder.status !== newStatus) {
         dispatch(
           updateSingleOrderStatus({ id: randomOrder.id, status: newStatus })
@@ -211,17 +234,16 @@ const OrderBoard = ({ openModal }: Props) => {
           }
         );
       }
-    }, 12000 + Math.random() * 3000);
+    }, 15000);
 
     return () => {
       clearInterval(addOrderInterval);
       clearInterval(statusChangeInterval);
     };
-  }, [orders, dispatch]);
+  }, [dispatch, enqueueSnackbar, statuses]);
 
   const handleOpenModal = (order: Order) => {
     openModal(order);
-    console.log('Opening modal for order:', order);
   };
 
   return (
@@ -229,8 +251,10 @@ const OrderBoard = ({ openModal }: Props) => {
       <Typography variant='h5' fontWeight={600} sx={{ mb: 2 }}>
         Orders Board
       </Typography>
+
       <OrderSummary />
       <ExportCSVButton orders={filteredOrders} />
+
       <FilterPanel
         status={statusFilter}
         onStatusChange={setStatusFilter}
@@ -245,6 +269,7 @@ const OrderBoard = ({ openModal }: Props) => {
         onStartDateChange={setCustomStartDate}
         onEndDateChange={setCustomEndDate}
       />
+
       <Button
         variant='outlined'
         size='small'
@@ -261,14 +286,15 @@ const OrderBoard = ({ openModal }: Props) => {
       >
         Reset Filters
       </Button>
+
       <SortBar
         sortBy={sortBy}
         sortDirection={sortDirection}
         onSortChange={(key) => {
           if (sortBy === key) {
-            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+            setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
           } else {
-            setSortBy(key);
+            setSortBy(key as SortKey);
             setSortDirection('asc');
           }
         }}
@@ -281,8 +307,33 @@ const OrderBoard = ({ openModal }: Props) => {
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
+        onDragStart={({ active }) => {
+          const dragged = orders.find((o) => o.id === active.id);
+          if (dragged) setActiveOrder(dragged);
+        }}
+        onDragEnd={({ active, over }) => {
+          setActiveOrder(null);
+          if (!over || !active) return;
+
+          const fromId = active.id;
+          const toStatus = over.id;
+          if (
+            fromId &&
+            toStatus &&
+            active.data.current?.status &&
+            active.data.current.status !== toStatus
+          ) {
+            dispatch(
+              updateSingleOrderStatus({
+                id: fromId as string,
+                status: toStatus as OrderStatus ,
+              })
+            );
+            enqueueSnackbar(`Order ${fromId} moved to ${toStatus}`, {
+              variant: 'success',
+            });
+          }
+        }}
       >
         <Grid
           container
@@ -294,7 +345,7 @@ const OrderBoard = ({ openModal }: Props) => {
             const filtered = filteredOrders.filter((o) => o.status === status);
             return (
               <Grid
-                item
+                {...({ item: true } as any)}
                 key={status}
                 sx={{
                   minWidth: { xs: '100%', sm: '380px', md: '400px' },
@@ -302,7 +353,6 @@ const OrderBoard = ({ openModal }: Props) => {
                   display: 'flex',
                   flexDirection: 'column',
                 }}
-                {...({} as any)}
               >
                 <BulkActions orders={filtered} />
                 <StatusColumn
@@ -315,8 +365,9 @@ const OrderBoard = ({ openModal }: Props) => {
             );
           })}
         </Grid>
+
         <DragOverlay>
-          {activeOrder && <OrderCard order={activeOrder} isDragging={true} />}
+          {activeOrder && <OrderCard order={activeOrder} isDragging />}
         </DragOverlay>
       </DndContext>
     </>

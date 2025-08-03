@@ -1,11 +1,34 @@
-export const STATUS_OPTIONS = [
-  'all',
+export const ORDER_STATUSES = [
   'pending',
   'processing',
   'shipped',
   'delivered',
   'cancelled',
 ] as const;
+
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+export type StatusFilter = 'all' | OrderStatus;
+
+export const STATUS_OPTIONS: readonly StatusFilter[] = [
+  'all',
+  ...ORDER_STATUSES,
+];
+
+// 4. Color mapping
+export const STATUS_COLORS: Record<OrderStatus, StatusColor> = {
+  pending: 'warning',
+  processing: 'info',
+  shipped: 'primary',
+  delivered: 'success',
+  cancelled: 'error',
+};
+
+export const STATUS_LABELS: Record<OrderStatus, string> = Object.fromEntries(
+  ORDER_STATUSES.map((status) => [
+    status,
+    status.charAt(0).toUpperCase() + status.slice(1),
+  ])
+) as Record<OrderStatus, string>;
 
 export const DATE_RANGE_OPTIONS = [
   'all',
@@ -16,15 +39,15 @@ export const DATE_RANGE_OPTIONS = [
 ] as const;
 
 export const SORT_OPTIONS = ['date', 'amount', 'customer', 'status'] as const;
+export type SortKey = (typeof SORT_OPTIONS)[number];
 
-export const SORT_LABELS: Record<string, string> = {
+export const SORT_LABELS: Record<SortKey, string> = {
   date: 'Date',
   amount: 'Amount',
   customer: 'Customer',
   status: 'Status',
 };
 
-// order status colors and labels
 export type StatusColor =
   | 'default'
   | 'primary'
@@ -33,25 +56,3 @@ export type StatusColor =
   | 'info'
   | 'success'
   | 'warning';
-
-export const STATUS_COLORS: Record<
-  'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled',
-  StatusColor
-> = {
-  pending: 'warning',
-  processing: 'info',
-  shipped: 'primary',
-  delivered: 'success',
-  cancelled: 'error',
-};
-
-export const STATUS_LABELS: Record<
-  'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled',
-  string
-> = {
-  pending: 'Pending',
-  processing: 'Processing',
-  shipped: 'Shipped',
-  delivered: 'Delivered',
-  cancelled: 'Cancelled',
-};
