@@ -1,5 +1,5 @@
 import { Paper, Typography, Pagination, Stack } from '@mui/material';
-import { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import DraggableOrderCard from './DraggableOrderCard';
 import { useDroppable } from '@dnd-kit/core';
 import { type Order } from '../../types/orderTypes';
@@ -19,10 +19,16 @@ const StatusColumn = ({ status, orders, onOpenModal, activeOrder }: Props) => {
   const [page, setPage] = useState(1);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(orders.length / itemsPerPage);
-  const paginated = orders.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
+
+  const paginated = useMemo(() => {
+    return orders.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  }, [orders, page]);
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(1);
+    }
+  }, [page, totalPages]);
 
   return (
     <Paper
@@ -67,4 +73,4 @@ const StatusColumn = ({ status, orders, onOpenModal, activeOrder }: Props) => {
   );
 };
 
-export default StatusColumn;
+export default React.memo(StatusColumn);
