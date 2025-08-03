@@ -7,14 +7,14 @@ export const getAppTheme = (mode: 'light' | 'dark') => {
     palette: {
       mode,
       primary: {
-        main: '#8e44ad', // 🍇 Deep modern purple
+        main: isDark ? '#8e44ad' : '#1976d2',
         contrastText: '#fff',
       },
       secondary: {
-        main: '#ff6f61', // Optional warm accent
+        main: '#ff6f61',
       },
       background: {
-        default: isDark ? '#121212' : '#f3f3f3',
+        default: isDark ? '#121212' : '#f0f4fb',
         paper: isDark ? '#1e1e1e' : '#ffffff',
       },
     },
@@ -29,6 +29,16 @@ export const getAppTheme = (mode: 'light' | 'dark') => {
       },
     },
     components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          body: {
+            background: isDark
+              ? '#121212'
+              : 'linear-gradient(to bottom right, #f0f4fb, #e6ecfa)',
+            transition: 'background 0.3s ease',
+          },
+        },
+      },
       MuiContainer: {
         defaultProps: {
           maxWidth: false,

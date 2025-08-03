@@ -1,4 +1,4 @@
-import { Typography, Button } from '@mui/material';
+import {  Button } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMemo, useState, useEffect, useRef } from 'react';
@@ -238,10 +238,6 @@ const OrderBoard = ({ openModal }: Props) => {
 
   return (
     <>
-      <Typography variant='h5' fontWeight={600} sx={{ mb: 2 }}>
-        Orders Board
-      </Typography>
-
       <OrderSummary />
       <ExportCSVButton orders={filteredOrders} />
 
