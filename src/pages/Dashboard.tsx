@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { CircularProgress, Box, Typography } from '@mui/material';
+import {
+  CircularProgress,
+  Box,
+  Typography,
+  Fade,
+  useTheme,
+} from '@mui/material';
 
 import { loadOrders } from '../store/OrderSlices/orderSlice';
 import { subscribeToOrders } from '../utils/ordersFirestore';
@@ -12,6 +18,7 @@ import OrderModal from '../components/Orders/OrderModal';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
+  const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -28,6 +35,7 @@ const Dashboard = () => {
     setModalOpen(false);
   };
 
+  // Fetch orders from Firestore
   useEffect(() => {
     const unsubscribe = subscribeToOrders(
       (fetchedOrders) => {
@@ -52,16 +60,24 @@ const Dashboard = () => {
         alignItems='center'
         minHeight='70vh'
         flexDirection='column'
+        sx={{ color: theme.palette.text.secondary }}
       >
         <CircularProgress />
-        <Typography mt={2}>Loading orders...</Typography>
+        <Typography mt={2} variant='body1'>
+          Loading orders...
+        </Typography>
       </Box>
     );
   }
 
   return (
     <>
-      <OrderBoard openModal={handleOpenModal} />
+      <Fade in={!loading} timeout={500}>
+        <Box>
+          <OrderBoard openModal={handleOpenModal} />
+        </Box>
+      </Fade>
+
       {selectedOrder && (
         <OrderModal
           open={modalOpen}
