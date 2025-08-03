@@ -7,6 +7,7 @@ import {
   Typography,
   Button,
   Divider,
+  useTheme,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { Dayjs } from 'dayjs';
@@ -39,6 +40,7 @@ const FilterPanel = ({
   onStartDateChange,
   onEndDateChange,
 }: Props) => {
+  const theme = useTheme();
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -150,9 +152,16 @@ const FilterPanel = ({
       <Divider sx={{ my: 1 }} />
 
       <Button
-        variant='outlined'
         size='medium'
-        color='secondary'
+        sx={{
+          color: '#fff',
+          backgroundColor:
+            theme.palette.mode === 'dark' ? '#8e44ad' : '#d32f2f', // 🔮 purple in dark, 🔴 red in light
+          '&:hover': {
+            backgroundColor:
+              theme.palette.mode === 'dark' ? '#732d91' : '#b71c1c',
+          },
+        }}
         onClick={() => {
           onSearchChange('');
           onDateRangeChange('all');

@@ -40,18 +40,6 @@ const orderSlice = createSlice({
         new Set([...state.selectedOrders, ...action.payload])
       );
     },
-    deselectAllOrders(state) {
-      state.selectedOrders = [];
-    },
-    bulkUpdateStatus(state, action: PayloadAction<OrderStatus>) {
-      const newStatus = action.payload;
-      state.orders = state.orders.map((order) =>
-        state.selectedOrders.includes(order.id)
-          ? { ...order, status: newStatus }
-          : order
-      );
-      state.selectedOrders = [];
-    },
   },
 });
 
@@ -60,8 +48,6 @@ export const {
   updateSingleOrderStatus,
   toggleSelectOrder,
   selectAllOrders,
-  deselectAllOrders,
-  bulkUpdateStatus,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

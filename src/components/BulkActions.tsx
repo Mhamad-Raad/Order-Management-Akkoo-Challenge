@@ -1,22 +1,28 @@
 import {
   Box,
   Button,
-  FormControl,
-  InputLabel,
+  Menu,
   MenuItem,
-  Select,
+  IconButton,
   Stack,
+  Tooltip,
+  useTheme,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSnackbar } from 'notistack';
 import {
-  bulkUpdateStatus,
-  deselectAllOrders,
+  updateSingleOrderStatus,
+  toggleSelectOrder,
   selectAllOrders,
 } from '../store/OrderSlices/orderSlice';
 import { type RootState } from '../store';
 import { type Order } from '../types/orderTypes';
 import { useState } from 'react';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+
+import { type OrderStatus } from '../types/orderTypes';
 
 interface Props {
   orders: Order[];
@@ -25,23 +31,35 @@ interface Props {
 const BulkActions = ({ orders }: Props) => {
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   const selectedOrders = useSelector(
     (state: RootState) => state.orders.selectedOrders
   );
-
-  const [selectedStatus, setSelectedStatus] = useState('');
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
 
   const visibleSelected = selectedOrders.filter((id) =>
     orders.some((o) => o.id === id)
   );
 
-  const handleBulkUpdate = (status: string) => {
-    dispatch(bulkUpdateStatus(status));
-    enqueueSnackbar(`Updated ${visibleSelected.length} orders to ${status}`, {
+  const handleBulkUpdate = (status: OrderStatus) => {
+    const idsInThisColumn = orders.map((o) => o.id);
+    const targets = selectedOrders.filter((id) => idsInThisColumn.includes(id));
+
+    if (targets.length === 0) return;
+
+    targets.forEach((id) => {
+      dispatch(updateSingleOrderStatus({ id, status }));
+    });
+
+    enqueueSnackbar(`Updated ${targets.length} orders to ${status}`, {
       variant: 'success',
     });
-    setSelectedStatus('Select status');
+
+    targets.forEach((id) => dispatch(toggleSelectOrder(id)));
+
+    setAnchorEl(null);
   };
 
   return (
@@ -49,48 +67,87 @@ const BulkActions = ({ orders }: Props) => {
       display='flex'
       alignItems='center'
       justifyContent='space-between'
-      mb={1}
+      gap={2}
+      mb={1.5}
       flexWrap='wrap'
-      gap={1}
+      sx={{
+        px: 1,
+        py: 1,
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: 2,
+        backgroundColor: theme.palette.background.paper,
+      }}
     >
-      <Stack direction='row' spacing={1}>
-        <Button
-          variant='outlined'
-          size='small'
-          onClick={() => dispatch(selectAllOrders(orders.map((o) => o.id)))}
-        >
-          Select All
-        </Button>
-        <Button
-          variant='outlined'
-          size='small'
-          onClick={() => dispatch(deselectAllOrders())}
-        >
-          Deselect All
-        </Button>
+      <Stack direction='row' spacing={1} alignItems='center'>
+        <Tooltip title='Select all visible orders'>
+          <Button
+            size='small'
+            variant='outlined'
+            onClick={() => dispatch(selectAllOrders(orders.map((o) => o.id)))}
+            startIcon={<CheckIcon fontSize='small' />}
+            sx={{ textTransform: 'none', fontWeight: 500 }}
+          >
+            Select All
+          </Button>
+        </Tooltip>
+
+        <Tooltip title='Clear selection'>
+          <Button
+            size='small'
+            variant='outlined'
+            onClick={() => {
+              // deselect all selected orders that are in that column
+              const visibleIds = orders.map((o) => o.id);
+              visibleIds.forEach((id) => {
+                if (selectedOrders.includes(id)) {
+                  dispatch(toggleSelectOrder(id));
+                }
+              });
+            }}
+            startIcon={<CloseIcon fontSize='small' />}
+            sx={{ textTransform: 'none', fontWeight: 500 }}
+          >
+            Deselect
+          </Button>
+        </Tooltip>
       </Stack>
 
-      <FormControl size='small' sx={{ minWidth: 200 }}>
-        <InputLabel>Update Status</InputLabel>
-        <Select
-          label='Update Status'
-          disabled={visibleSelected.length === 0}
-          value={selectedStatus}
-          defaultValue='Update Status'
-          onChange={(e) => {
-            handleBulkUpdate(e.target.value);
-          }}
+      <Box>
+        <Tooltip title='Bulk update status'>
+          <span>
+            <IconButton
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+              disabled={visibleSelected.length === 0}
+              size='small'
+              sx={{
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: 1,
+              }}
+            >
+              <MoreVertIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
+
+        <Menu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={() => setAnchorEl(null)}
+          MenuListProps={{ dense: true }}
         >
-          <MenuItem value='Select status' disabled>
-            Select status
-          </MenuItem>
-          <MenuItem value='pending'>Pending</MenuItem>
-          <MenuItem value='processing'>Processing</MenuItem>
-          <MenuItem value='shipped'>Shipped</MenuItem>
-          <MenuItem value='delivered'>Delivered</MenuItem>
-          <MenuItem value='cancelled'>Cancelled</MenuItem>
-        </Select>
-      </FormControl>
+          {['pending', 'processing', 'shipped', 'delivered', 'cancelled'].map(
+            (status) => (
+              <MenuItem
+                key={status}
+                onClick={() => handleBulkUpdate(status as OrderStatus)}
+                sx={{ textTransform: 'capitalize' }}
+              >
+                {status}
+              </MenuItem>
+            )
+          )}
+        </Menu>
+      </Box>
     </Box>
   );
 };
