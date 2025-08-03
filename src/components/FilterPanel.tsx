@@ -44,9 +44,14 @@ const FilterPanel = ({
   onEndDateChange,
 }: Props) => {
   const searchRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' && document.activeElement?.tagName !== 'INPUT') {
+      if (
+        e.key === 'Enter' &&
+        e.shiftKey &&
+        document.activeElement?.tagName !== 'INPUT'
+      ) {
         searchRef.current?.focus();
       }
     };
