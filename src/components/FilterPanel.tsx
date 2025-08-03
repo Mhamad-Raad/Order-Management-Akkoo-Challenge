@@ -64,14 +64,13 @@ const FilterPanel = ({
         mb: 4,
         px: 1,
         py: 2,
-        minWidth: 280,
+        width: '100%',
       }}
     >
       <Typography variant='h6' fontWeight={600}>
         Filters
       </Typography>
 
-      {/* 🔍 Search */}
       <Box>
         <Typography variant='subtitle2' gutterBottom>
           Search
@@ -86,7 +85,6 @@ const FilterPanel = ({
         />
       </Box>
 
-      {/* 🗓 Date Range */}
       <Box>
         <Typography variant='subtitle2' gutterBottom>
           Date Range
@@ -129,7 +127,6 @@ const FilterPanel = ({
         )}
       </Box>
 
-      {/* 💵 Amount Range */}
       <Box>
         <Typography variant='subtitle2' gutterBottom>
           Amount Range
@@ -152,7 +149,6 @@ const FilterPanel = ({
 
       <Divider sx={{ my: 1 }} />
 
-      {/* 🔁 Reset */}
       <Button
         variant='outlined'
         size='medium'
