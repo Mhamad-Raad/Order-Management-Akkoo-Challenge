@@ -16,27 +16,15 @@ import {
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { updateSingleOrderStatus } from '../../store/OrderSlices/orderSlice';
-import { type Order } from '../../types/orderTypes';
-
 import { useSnackbar } from 'notistack';
+import { updateSingleOrderStatus } from '../../store/OrderSlices/orderSlice';
 
-const statusColor = (status: string) => {
-  switch (status) {
-    case 'pending':
-      return 'warning';
-    case 'processing':
-      return 'info';
-    case 'shipped':
-      return 'primary';
-    case 'delivered':
-      return 'success';
-    case 'cancelled':
-      return 'error';
-    default:
-      return 'default';
-  }
-};
+import {
+  ORDER_STATUSES,
+  STATUS_COLORS,
+  STATUS_LABELS,
+} from '../../constants/orderStatus';
+import { type OrderStatus, type Order } from '../../types/orderTypes';
 
 interface Props {
   open: boolean;
@@ -45,37 +33,27 @@ interface Props {
 }
 
 const OrderModal = ({ open, onClose, order }: Props) => {
-  const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
-  const [localStatus, setLocalStatus] = useState(order?.status ?? '');
+  const { enqueueSnackbar } = useSnackbar();
+  const [localStatus, setLocalStatus] = useState<OrderStatus | ''>('');
 
   useEffect(() => {
     setLocalStatus(order?.status ?? '');
   }, [order]);
 
-  if (!order) return null;
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
+      if (e.key === 'Escape') onClose();
     };
-
-    if (open) {
-      window.addEventListener('keydown', handleKeyDown);
-    }
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
+    if (open) window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [open, onClose]);
 
-  const handleStatusChange = (newStatus: string) => {
+  if (!order) return null;
+
+  const handleStatusChange = (newStatus: OrderStatus) => {
     setLocalStatus(newStatus);
-
     dispatch(updateSingleOrderStatus({ id: order.id, status: newStatus }));
-
     enqueueSnackbar(`Order ${order.id} status updated to ${newStatus}`, {
       variant: 'success',
     });
@@ -87,8 +65,8 @@ const OrderModal = ({ open, onClose, order }: Props) => {
         <Box display='flex' justifyContent='space-between' alignItems='center'>
           <Typography variant='h6'>{order.customerName}</Typography>
           <Chip
-            label={localStatus}
-            color={statusColor(localStatus)}
+            label={STATUS_LABELS[localStatus as OrderStatus] || localStatus}
+            color={STATUS_COLORS[localStatus as OrderStatus]}
             size='small'
           />
         </Box>
@@ -121,13 +99,13 @@ const OrderModal = ({ open, onClose, order }: Props) => {
           <Select
             value={localStatus}
             label='Status'
-            onChange={(e) => handleStatusChange(e.target.value)}
+            onChange={(e) => handleStatusChange(e.target.value as OrderStatus)}
           >
-            <MenuItem value='pending'>Pending</MenuItem>
-            <MenuItem value='processing'>Processing</MenuItem>
-            <MenuItem value='shipped'>Shipped</MenuItem>
-            <MenuItem value='delivered'>Delivered</MenuItem>
-            <MenuItem value='cancelled'>Cancelled</MenuItem>
+            {ORDER_STATUSES.map((status) => (
+              <MenuItem key={status} value={status}>
+                {STATUS_LABELS[status]}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 

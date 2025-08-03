@@ -15,3 +15,10 @@ export const STATUS_COLORS: Record<OrderStatus, StatusColor> = {
   delivered: 'success',
   cancelled: 'error',
 };
+
+export const STATUS_LABELS: Record<OrderStatus, string> = Object.fromEntries(
+  ORDER_STATUSES.map((status) => [
+    status,
+    status.charAt(0).toUpperCase() + status.slice(1),
+  ])
+) as Record<OrderStatus, string>;
