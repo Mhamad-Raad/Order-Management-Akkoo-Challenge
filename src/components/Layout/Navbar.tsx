@@ -21,17 +21,25 @@ const Navbar = () => {
     <AppBar
       position='sticky'
       color='default'
-      elevation={1}
+      elevation={0}
       sx={{
         backgroundColor:
-          mode === 'dark' ? theme.palette.background.paper : '#fdfdfd',
+          mode === 'dark' ? theme.palette.background.paper : '#fff',
         borderBottom: '1px solid',
         borderColor: theme.palette.divider,
+        transition: 'all 0.3s ease',
       }}
     >
       <Container maxWidth='lg'>
-        <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
-          <Typography variant='h6' fontWeight={700}>
+        <Toolbar
+          disableGutters
+          sx={{ justifyContent: 'space-between', py: 1.5 }}
+        >
+          <Typography
+            variant='h6'
+            fontWeight={700}
+            sx={{ fontFamily: 'Inter, sans-serif' }}
+          >
             Akkooo Orders
           </Typography>
 
@@ -40,12 +48,9 @@ const Navbar = () => {
               onClick={() => dispatch(toggleTheme())}
               color='inherit'
               aria-label='Toggle theme'
+              sx={{ transition: 'transform 0.3s ease' }}
             >
-              {theme.palette.mode === 'dark' ? (
-                <Brightness7 />
-              ) : (
-                <Brightness4 />
-              )}
+              {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
             </IconButton>
           </Box>
         </Toolbar>
