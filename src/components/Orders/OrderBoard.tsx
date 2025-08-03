@@ -28,6 +28,7 @@ import SortBar from '../SortBar';
 import BulkActions from '../BulkActions';
 
 import { generateId } from '../../utils/generateId';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 
 dayjs.extend(isBetween);
 
@@ -45,6 +46,7 @@ const OrderBoard = ({ openModal }: Props) => {
   const [activeOrder, setActiveOrder] = useState<Order | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
   const [dateRange, setDateRange] = useState('all');
   const [amountRange, setAmountRange] = useState([0, 2000]);
   const [customStartDate, setCustomStartDate] = useState<Dayjs | null>(null);
@@ -86,8 +88,8 @@ const OrderBoard = ({ openModal }: Props) => {
     if (statusFilter !== 'all') {
       result = result.filter((o) => o.status === statusFilter);
     }
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
+    if (debouncedSearchTerm) {
+      const term = debouncedSearchTerm.toLowerCase();
       result = result.filter(
         (o) =>
           o.customerName.toLowerCase().includes(term) ||
