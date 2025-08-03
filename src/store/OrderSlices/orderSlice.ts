@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { type Order } from '../../types/orderTypes';
+import { type Order, type OrderStatus } from '../../types/orderTypes';
 
 interface OrderState {
   orders: Order[];
@@ -20,7 +20,7 @@ const orderSlice = createSlice({
     },
     updateSingleOrderStatus(
       state,
-      action: PayloadAction<{ id: string; status: string }>
+      action: PayloadAction<{ id: string; status: OrderStatus }>
     ) {
       const { id, status } = action.payload;
       state.orders = state.orders.map((order) =>
@@ -43,7 +43,7 @@ const orderSlice = createSlice({
     deselectAllOrders(state) {
       state.selectedOrders = [];
     },
-    bulkUpdateStatus(state, action: PayloadAction<string>) {
+    bulkUpdateStatus(state, action: PayloadAction<OrderStatus>) {
       const newStatus = action.payload;
       state.orders = state.orders.map((order) =>
         state.selectedOrders.includes(order.id)

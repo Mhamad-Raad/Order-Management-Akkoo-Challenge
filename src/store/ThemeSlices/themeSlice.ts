@@ -1,14 +1,22 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// Read from localStorage if exists, otherwise default to 'light'
-const storedMode = localStorage.getItem('themeMode') as 'light' | 'dark' | null;
-
 interface ThemeState {
   mode: 'light' | 'dark';
 }
 
+// SSR-safe localStorage access even tho it is not needed for React
+const getInitialMode = (): 'light' | 'dark' => {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem('themeMode');
+    if (stored === 'light' || stored === 'dark') {
+      return stored;
+    }
+  }
+  return 'light';
+};
+
 const initialState: ThemeState = {
-  mode: storedMode ?? 'light',
+  mode: getInitialMode(),
 };
 
 const themeSlice = createSlice({
@@ -19,8 +27,9 @@ const themeSlice = createSlice({
       const newMode = state.mode === 'light' ? 'dark' : 'light';
       state.mode = newMode;
 
-      // Save to localStorage
-      localStorage.setItem('themeMode', newMode);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('themeMode', newMode);
+      }
     },
   },
 });
