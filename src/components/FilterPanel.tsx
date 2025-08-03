@@ -1,18 +1,12 @@
 import { useEffect, useRef } from 'react';
-
 import { Box, TextField, MenuItem, Slider, Typography } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { Dayjs } from 'dayjs';
 
-const statusOptions = [
-  'all',
-  'pending',
-  'processing',
-  'shipped',
-  'delivered',
-  'cancelled',
-];
-const dateOptions = ['all', 'today', 'week', 'month', 'custom'];
+import {
+  STATUS_OPTIONS as statusOptions,
+  DATE_RANGE_OPTIONS as dateOptions,
+} from '../constants';
 
 interface Props {
   status: string;
@@ -55,18 +49,19 @@ const FilterPanel = ({
         searchRef.current?.focus();
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [searchRef]);
+  }, []);
+
   return (
     <Box display='flex' gap={2} mb={3} flexWrap='wrap' alignItems='center'>
       <TextField
         label='Search'
+        placeholder='Customer or Order ID'
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
-        placeholder='Customer or Order ID'
         inputRef={searchRef}
+        inputProps={{ 'aria-label': 'Search by customer or order ID' }}
       />
 
       <TextField
@@ -99,7 +94,6 @@ const FilterPanel = ({
         ))}
       </TextField>
 
-      {/* Always show custom date inputs */}
       <Box display='flex' gap={2} alignItems='center'>
         <DatePicker
           label='Start Date'
@@ -109,10 +103,7 @@ const FilterPanel = ({
           slotProps={{
             textField: {
               variant: 'outlined',
-              sx: {
-                width: 150,
-                opacity: dateRange === 'custom' ? 1 : 0.6,
-              },
+              sx: { width: 150, opacity: dateRange === 'custom' ? 1 : 0.6 },
             },
           }}
         />
@@ -124,10 +115,7 @@ const FilterPanel = ({
           slotProps={{
             textField: {
               variant: 'outlined',
-              sx: {
-                width: 150,
-                opacity: dateRange === 'custom' ? 1 : 0.6,
-              },
+              sx: { width: 150, opacity: dateRange === 'custom' ? 1 : 0.6 },
             },
           }}
         />
