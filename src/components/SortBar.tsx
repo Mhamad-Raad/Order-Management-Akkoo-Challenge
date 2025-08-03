@@ -1,5 +1,10 @@
 import { Box, Button } from '@mui/material';
 
+import {
+  SORT_OPTIONS as SortOptions,
+  SORT_LABELS as sortLabels,
+} from '../constants';
+
 interface Props {
   sortBy: string;
   sortDirection: 'asc' | 'desc';
@@ -7,29 +12,12 @@ interface Props {
   onResetSort: () => void;
 }
 
-const SortOptions = ['date', 'amount', 'customer', 'status'];
-
 const SortBar = ({
   sortBy,
   sortDirection,
   onSortChange,
   onResetSort,
 }: Props) => {
-  const getLabel = (key: string) => {
-    switch (key) {
-      case 'date':
-        return 'Date';
-      case 'amount':
-        return 'Amount';
-      case 'customer':
-        return 'Customer';
-      case 'status':
-        return 'Status';
-      default:
-        return key;
-    }
-  };
-
   return (
     <Box
       display='flex'
@@ -48,8 +36,9 @@ const SortBar = ({
             variant={sortBy === key ? 'contained' : 'outlined'}
             size='small'
             onClick={() => onSortChange(key)}
+            aria-pressed={sortBy === key}
           >
-            {getLabel(key)}
+            {sortLabels[key] ?? key}
             {sortBy === key ? (sortDirection === 'asc' ? ' ↑' : ' ↓') : ''}
           </Button>
         ))}

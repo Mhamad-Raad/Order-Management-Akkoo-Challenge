@@ -14,3 +14,12 @@ export const DATE_RANGE_OPTIONS = [
   'month',
   'custom',
 ] as const;
+
+export const SORT_OPTIONS = ['date', 'amount', 'customer', 'status'] as const;
+
+export const SORT_LABELS: Record<string, string> = {
+  date: 'Date',
+  amount: 'Amount',
+  customer: 'Customer',
+  status: 'Status',
+};
