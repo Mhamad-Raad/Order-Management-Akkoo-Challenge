@@ -1,6 +1,8 @@
 import { Paper, Typography, Grid } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { type RootState } from '../../store';
+import { ORDER_STATUSES } from '../../constants/orderStatus';
+import { type OrderStatus } from '../../types/orderTypes';
 
 const OrderSummary = () => {
   const orders = useSelector((state: RootState) => state.orders.orders);
@@ -8,19 +10,21 @@ const OrderSummary = () => {
   const totalOrders = orders.length;
   const totalRevenue = orders.reduce((acc, curr) => acc + curr.total, 0);
 
-  const statusCounts = orders.reduce<Record<string, number>>((acc, curr) => {
-    acc[curr.status] = (acc[curr.status] || 0) + 1;
-    return acc;
-  }, {});
+  const statusCounts = orders.reduce<Record<OrderStatus, number>>(
+    (acc, curr) => {
+      acc[curr.status] = (acc[curr.status] || 0) + 1;
+      return acc;
+    },
+    {} as Record<OrderStatus, number>
+  );
 
   const summaryData = [
     { label: 'Total Orders', value: totalOrders },
     { label: 'Total Revenue', value: `$${totalRevenue.toFixed(2)}` },
-    { label: 'Pending', value: statusCounts['pending'] || 0 },
-    { label: 'Processing', value: statusCounts['processing'] || 0 },
-    { label: 'Shipped', value: statusCounts['shipped'] || 0 },
-    { label: 'Delivered', value: statusCounts['delivered'] || 0 },
-    { label: 'Cancelled', value: statusCounts['cancelled'] || 0 },
+    ...ORDER_STATUSES.map((status) => ({
+      label: status.charAt(0).toUpperCase() + status.slice(1),
+      value: statusCounts[status] || 0,
+    })),
   ];
 
   return (
