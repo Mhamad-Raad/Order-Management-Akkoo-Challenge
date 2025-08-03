@@ -1,4 +1,3 @@
-import {  Button } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMemo, useState, useEffect, useRef } from 'react';
@@ -253,22 +252,6 @@ const OrderBoard = ({ openModal }: Props) => {
         onStartDateChange={setCustomStartDate}
         onEndDateChange={setCustomEndDate}
       />
-
-      <Button
-        variant='outlined'
-        size='small'
-        color='secondary'
-        sx={{ mb: 2 }}
-        onClick={() => {
-          setSearchTerm('');
-          setDateRange('all');
-          setAmountRange([0, 2000]);
-          setCustomStartDate(null);
-          setCustomEndDate(null);
-        }}
-      >
-        Reset Filters
-      </Button>
 
       <SortBar
         sortBy={sortBy}

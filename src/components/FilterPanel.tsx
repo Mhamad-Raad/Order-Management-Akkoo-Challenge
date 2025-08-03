@@ -1,5 +1,13 @@
 import { useEffect, useRef, type SetStateAction, type Dispatch } from 'react';
-import { Box, TextField, MenuItem, Slider, Typography } from '@mui/material';
+import {
+  Box,
+  TextField,
+  MenuItem,
+  Slider,
+  Typography,
+  Button,
+  Divider,
+} from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { Dayjs } from 'dayjs';
 
@@ -54,33 +62,41 @@ const FilterPanel = ({
         flexDirection: 'column',
         gap: 3,
         mb: 4,
+        px: 1,
+        py: 2,
+        minWidth: 280,
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 2,
-          alignItems: 'center',
-        }}
-      >
+      <Typography variant='h6' fontWeight={600}>
+        Filters
+      </Typography>
+
+      {/* 🔍 Search */}
+      <Box>
+        <Typography variant='subtitle2' gutterBottom>
+          Search
+        </Typography>
         <TextField
           fullWidth
-          label='Search'
-          placeholder='Customer name or Order ID'
+          size='small'
+          placeholder='Customer or Order ID'
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           inputRef={searchRef}
-          inputProps={{ 'aria-label': 'Search by customer or order ID' }}
-          sx={{ flex: 2, minWidth: 220 }}
         />
+      </Box>
 
+      {/* 🗓 Date Range */}
+      <Box>
+        <Typography variant='subtitle2' gutterBottom>
+          Date Range
+        </Typography>
         <TextField
+          fullWidth
           select
-          label='Date Range'
+          size='small'
           value={dateRange}
           onChange={(e) => onDateRangeChange(e.target.value as DateRangeType)}
-          sx={{ flex: 1, minWidth: 150 }}
         >
           {dateOptions.map((option) => (
             <MenuItem key={option} value={option}>
@@ -90,44 +106,32 @@ const FilterPanel = ({
             </MenuItem>
           ))}
         </TextField>
+
+        {dateRange === 'custom' && (
+          <Box mt={2} display='flex' gap={2}>
+            <DatePicker
+              label='Start'
+              value={customStartDate}
+              onChange={onStartDateChange}
+              slotProps={{
+                textField: { size: 'small', fullWidth: true },
+              }}
+            />
+            <DatePicker
+              label='End'
+              value={customEndDate}
+              onChange={onEndDateChange}
+              slotProps={{
+                textField: { size: 'small', fullWidth: true },
+              }}
+            />
+          </Box>
+        )}
       </Box>
 
-      {dateRange === 'custom' && (
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 2,
-            flexWrap: 'wrap',
-            alignItems: 'center',
-          }}
-        >
-          <DatePicker
-            label='Start Date'
-            value={customStartDate}
-            onChange={onStartDateChange}
-            slotProps={{
-              textField: {
-                variant: 'outlined',
-                sx: { width: 150 },
-              },
-            }}
-          />
-          <DatePicker
-            label='End Date'
-            value={customEndDate}
-            onChange={onEndDateChange}
-            slotProps={{
-              textField: {
-                variant: 'outlined',
-                sx: { width: 150 },
-              },
-            }}
-          />
-        </Box>
-      )}
-
-      <Box sx={{ maxWidth: 400 }}>
-        <Typography gutterBottom fontWeight={500}>
+      {/* 💵 Amount Range */}
+      <Box>
+        <Typography variant='subtitle2' gutterBottom>
           Amount Range
         </Typography>
         <Box display='flex' justifyContent='space-between' mb={0.5}>
@@ -145,6 +149,24 @@ const FilterPanel = ({
           step={10}
         />
       </Box>
+
+      <Divider sx={{ my: 1 }} />
+
+      {/* 🔁 Reset */}
+      <Button
+        variant='outlined'
+        size='medium'
+        color='secondary'
+        onClick={() => {
+          onSearchChange('');
+          onDateRangeChange('all');
+          onAmountChange([0, 2000]);
+          onStartDateChange(null);
+          onEndDateChange(null);
+        }}
+      >
+        Reset Filters
+      </Button>
     </Box>
   );
 };
