@@ -16,6 +16,7 @@ import {
 } from '../store/OrderSlices/orderSlice';
 import { type RootState } from '../store';
 import { type Order } from '../store/OrderSlices/orderTypes';
+import { useState } from 'react';
 
 interface Props {
   orders: Order[];
@@ -29,6 +30,8 @@ const BulkActions = ({ orders }: Props) => {
     (state: RootState) => state.orders.selectedOrders
   );
 
+  const [selectedStatus, setSelectedStatus] = useState('');
+
   const visibleSelected = selectedOrders.filter((id) =>
     orders.some((o) => o.id === id)
   );
@@ -38,6 +41,7 @@ const BulkActions = ({ orders }: Props) => {
     enqueueSnackbar(`Updated ${visibleSelected.length} orders to ${status}`, {
       variant: 'success',
     });
+    setSelectedStatus('Select status');
   };
 
   return (
@@ -46,6 +50,8 @@ const BulkActions = ({ orders }: Props) => {
       alignItems='center'
       justifyContent='space-between'
       mb={1}
+      flexWrap='wrap'
+      gap={1}
     >
       <Stack direction='row' spacing={1}>
         <Button
@@ -69,9 +75,15 @@ const BulkActions = ({ orders }: Props) => {
         <Select
           label='Update Status'
           disabled={visibleSelected.length === 0}
-          onChange={(e) => handleBulkUpdate(e.target.value)}
-          defaultValue=''
+          value={selectedStatus}
+          defaultValue='Update Status'
+          onChange={(e) => {
+            handleBulkUpdate(e.target.value);
+          }}
         >
+          <MenuItem value='Select status' disabled>
+            Select status
+          </MenuItem>
           <MenuItem value='pending'>Pending</MenuItem>
           <MenuItem value='processing'>Processing</MenuItem>
           <MenuItem value='shipped'>Shipped</MenuItem>

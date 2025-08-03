@@ -50,6 +50,7 @@ const orderSlice = createSlice({
           ? { ...order, status: newStatus }
           : order
       );
+      state.selectedOrders = [];
     },
   },
 });
