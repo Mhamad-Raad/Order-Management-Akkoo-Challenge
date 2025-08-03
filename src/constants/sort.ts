@@ -6,5 +6,4 @@ export const SORT_LABELS: Record<SortKey, string> = {
   date: 'Date',
   amount: 'Amount',
   customer: 'Customer',
-  status: 'Status',
 };
