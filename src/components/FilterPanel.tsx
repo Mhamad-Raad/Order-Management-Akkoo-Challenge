@@ -4,7 +4,6 @@ import { DatePicker } from '@mui/x-date-pickers';
 import { Dayjs } from 'dayjs';
 
 import { DATE_RANGE_OPTIONS as dateOptions } from '../constants/filters';
-
 import type { DateRangeType } from '../types/filterTypes';
 
 interface Props {
@@ -49,61 +48,88 @@ const FilterPanel = ({
   }, []);
 
   return (
-    <Box display='flex' gap={2} mb={3} flexWrap='wrap' alignItems='center'>
-      <TextField
-        label='Search'
-        placeholder='Customer or Order ID'
-        value={searchTerm}
-        onChange={(e) => onSearchChange(e.target.value)}
-        inputRef={searchRef}
-        inputProps={{ 'aria-label': 'Search by customer or order ID' }}
-      />
-
-      <TextField
-        select
-        label='Date'
-        value={dateRange}
-        onChange={(e) => onDateRangeChange(e.target.value as DateRangeType)}
-        sx={{ minWidth: 150 }}
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+        mb: 4,
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 2,
+          alignItems: 'center',
+        }}
       >
-        {dateOptions.map((option) => (
-          <MenuItem key={option} value={option}>
-            {option === 'all'
-              ? 'All Time'
-              : option.charAt(0).toUpperCase() + option.slice(1)}
-          </MenuItem>
-        ))}
-      </TextField>
+        <TextField
+          fullWidth
+          label='Search'
+          placeholder='Customer name or Order ID'
+          value={searchTerm}
+          onChange={(e) => onSearchChange(e.target.value)}
+          inputRef={searchRef}
+          inputProps={{ 'aria-label': 'Search by customer or order ID' }}
+          sx={{ flex: 2, minWidth: 220 }}
+        />
 
-      <Box display='flex' gap={2} alignItems='center'>
-        <DatePicker
-          label='Start Date'
-          value={customStartDate}
-          onChange={onStartDateChange}
-          disabled={dateRange !== 'custom'}
-          slotProps={{
-            textField: {
-              variant: 'outlined',
-              sx: { width: 150, opacity: dateRange === 'custom' ? 1 : 0.6 },
-            },
-          }}
-        />
-        <DatePicker
-          label='End Date'
-          value={customEndDate}
-          onChange={onEndDateChange}
-          disabled={dateRange !== 'custom'}
-          slotProps={{
-            textField: {
-              variant: 'outlined',
-              sx: { width: 150, opacity: dateRange === 'custom' ? 1 : 0.6 },
-            },
-          }}
-        />
+        <TextField
+          select
+          label='Date Range'
+          value={dateRange}
+          onChange={(e) => onDateRangeChange(e.target.value as DateRangeType)}
+          sx={{ flex: 1, minWidth: 150 }}
+        >
+          {dateOptions.map((option) => (
+            <MenuItem key={option} value={option}>
+              {option === 'all'
+                ? 'All Time'
+                : option.charAt(0).toUpperCase() + option.slice(1)}
+            </MenuItem>
+          ))}
+        </TextField>
       </Box>
 
-      <Box width={250}>
-        <Typography gutterBottom>Amount Range</Typography>
+      {dateRange === 'custom' && (
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            flexWrap: 'wrap',
+            alignItems: 'center',
+          }}
+        >
+          <DatePicker
+            label='Start Date'
+            value={customStartDate}
+            onChange={onStartDateChange}
+            slotProps={{
+              textField: {
+                variant: 'outlined',
+                sx: { width: 150 },
+              },
+            }}
+          />
+          <DatePicker
+            label='End Date'
+            value={customEndDate}
+            onChange={onEndDateChange}
+            slotProps={{
+              textField: {
+                variant: 'outlined',
+                sx: { width: 150 },
+              },
+            }}
+          />
+        </Box>
+      )}
+
+      <Box sx={{ maxWidth: 400 }}>
+        <Typography gutterBottom fontWeight={500}>
+          Amount Range
+        </Typography>
         <Box display='flex' justifyContent='space-between' mb={0.5}>
           <Typography variant='caption'>Min: ${amountRange[0]}</Typography>
           <Typography variant='caption'>Max: ${amountRange[1]}</Typography>
