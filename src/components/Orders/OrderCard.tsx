@@ -28,12 +28,23 @@ const statusColor = (status: string) => {
   }
 };
 
-const OrderCard = ({ order }: { order: Order }) => {
+interface Props {
+  order: Order;
+  onOpenModal?: (order: Order) => void;
+  isGhost?: boolean;
+  isDragging?: boolean;
+}
+
+const OrderCard = ({
+  order,
+  onOpenModal,
+  isGhost = false,
+  isDragging = false,
+}: Props) => {
   const dispatch = useDispatch();
   const selectedOrders = useSelector(
     (state: RootState) => state.orders.selectedOrders
   );
-
   const isSelected = selectedOrders.includes(order.id);
 
   const handleCheckboxClick = (e: React.MouseEvent) => {
@@ -42,8 +53,25 @@ const OrderCard = ({ order }: { order: Order }) => {
     dispatch(toggleSelectOrder(order.id));
   };
 
+  const handleCardClick = () => {
+    if (onOpenModal) {
+      onOpenModal(order);
+    }
+  };
+
   return (
-    <Card variant='outlined' sx={{ mb: 2 }}>
+    <Card
+      variant='outlined'
+      sx={{
+        mb: 2,
+        cursor: 'pointer',
+        opacity: isGhost ? 0.3 : 1,
+        transform: isDragging ? 'rotate(2deg)' : 'none',
+        boxShadow: isDragging ? 6 : 1,
+        transition: 'all 0.2s ease-in-out',
+      }}
+      onClick={handleCardClick}
+    >
       <CardContent>
         <Stack
           direction='row'

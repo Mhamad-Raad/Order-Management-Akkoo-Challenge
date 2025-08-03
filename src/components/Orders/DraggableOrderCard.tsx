@@ -5,12 +5,12 @@ import { type Order } from '../../store/OrderSlices/orderTypes';
 
 interface Props {
   order: Order;
+  onOpenModal: (order: Order) => void;
+  ghost?: boolean;
 }
 
-const DraggableOrderCard = ({ order }: Props) => {
-  if (!order) return null;
-
-  const { setNodeRef, listeners, attributes } = useDraggable({
+const DraggableOrderCard = ({ order, onOpenModal, ghost }: Props) => {
+  const { setNodeRef, listeners, attributes, isDragging } = useDraggable({
     id: order.id,
     data: { ...order },
   });
@@ -22,7 +22,12 @@ const DraggableOrderCard = ({ order }: Props) => {
       {...attributes}
       sx={{ cursor: 'grab' }}
     >
-      <OrderCard order={order} />
+      <OrderCard
+        order={order}
+        onOpenModal={onOpenModal}
+        isGhost={ghost}
+        isDragging={isDragging}
+      />
     </Box>
   );
 };

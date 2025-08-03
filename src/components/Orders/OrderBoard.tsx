@@ -5,7 +5,14 @@ import isBetween from 'dayjs/plugin/isBetween';
 import { type RootState } from '../../store';
 import { Grid, Typography, Button } from '@mui/material';
 import StatusColumn from './StatusColumn';
-import { DndContext, closestCenter, DragOverlay } from '@dnd-kit/core';
+import {
+  DndContext,
+  closestCenter,
+  DragOverlay,
+  MouseSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
 import { useMemo, useState, useEffect } from 'react';
 import { type Order } from '../../store/OrderSlices/orderTypes';
 import OrderCard from './OrderCard';
@@ -26,7 +33,11 @@ dayjs.extend(isBetween);
 
 const statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 
-const OrderBoard = () => {
+interface Props {
+  openModal: (order: Order) => void;
+}
+
+const OrderBoard = ({ openModal }: Props) => {
   const orders = useSelector((state: RootState) => state.orders.orders);
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
@@ -60,6 +71,15 @@ const OrderBoard = () => {
       });
     }
   };
+
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      delay: 150,
+      tolerance: 5,
+    },
+  });
+
+  const sensors = useSensors(mouseSensor);
 
   const filteredOrders = useMemo(() => {
     let result = [...orders];
@@ -197,6 +217,11 @@ const OrderBoard = () => {
     };
   }, [orders, dispatch]);
 
+  const handleOpenModal = (order: Order) => {
+    openModal(order);
+    console.log('Opening modal for order:', order);
+  };
+
   return (
     <>
       <Typography variant='h5' fontWeight={600} sx={{ mb: 2 }}>
@@ -252,6 +277,7 @@ const OrderBoard = () => {
       />
 
       <DndContext
+        sensors={sensors}
         collisionDetection={closestCenter}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
@@ -277,13 +303,18 @@ const OrderBoard = () => {
                 {...({} as any)}
               >
                 <BulkActions orders={filtered} />
-                <StatusColumn status={status} orders={filtered} />
+                <StatusColumn
+                  status={status}
+                  orders={filtered}
+                  onOpenModal={handleOpenModal}
+                  activeOrder={activeOrder}
+                />
               </Grid>
             );
           })}
         </Grid>
         <DragOverlay>
-          {activeOrder && <OrderCard order={activeOrder} />}
+          {activeOrder && <OrderCard order={activeOrder} isDragging={true} />}
         </DragOverlay>
       </DndContext>
     </>

@@ -7,9 +7,11 @@ import { type Order } from '../../store/OrderSlices/orderTypes';
 interface Props {
   status: string;
   orders: Order[];
+  onOpenModal: (order: Order) => void;
+  activeOrder: Order | null;
 }
 
-const StatusColumn = ({ status, orders }: Props) => {
+const StatusColumn = ({ status, orders, onOpenModal, activeOrder }: Props) => {
   const { setNodeRef: setDropRef } = useDroppable({
     id: status,
   });
@@ -45,7 +47,12 @@ const StatusColumn = ({ status, orders }: Props) => {
       </Typography>
 
       {paginated.map((order) => (
-        <DraggableOrderCard key={order.id} order={order} />
+        <DraggableOrderCard
+          key={order.id}
+          order={order}
+          onOpenModal={onOpenModal}
+          ghost={activeOrder?.id === order.id}
+        />
       ))}
 
       <Stack direction='row' justifyContent='center' sx={{ mt: 'auto' }}>
