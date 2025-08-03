@@ -30,7 +30,7 @@ const Navbar = () => {
         transition: 'all 0.3s ease',
       }}
     >
-      <Container maxWidth='lg'>
+      <Container>
         <Toolbar
           disableGutters
           sx={{ justifyContent: 'space-between', py: 1.5 }}
