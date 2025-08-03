@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+
 import { Box, TextField, MenuItem, Slider, Typography } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { Dayjs } from 'dayjs';
@@ -41,6 +43,17 @@ const FilterPanel = ({
   onStartDateChange,
   onEndDateChange,
 }: Props) => {
+  const searchRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && document.activeElement?.tagName !== 'INPUT') {
+        searchRef.current?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [searchRef]);
   return (
     <Box display='flex' gap={2} mb={3} flexWrap='wrap' alignItems='center'>
       <TextField
@@ -48,6 +61,7 @@ const FilterPanel = ({
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
         placeholder='Customer or Order ID'
+        inputRef={searchRef}
       />
 
       <TextField
