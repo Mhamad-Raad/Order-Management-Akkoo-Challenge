@@ -64,7 +64,7 @@ const OrderBoard = ({ openModal }: Props) => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
-  const statuses = useMemo(() => ORDER_STATUSES.slice(1), []);
+  const statuses = useMemo(() => ORDER_STATUSES, []);
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
