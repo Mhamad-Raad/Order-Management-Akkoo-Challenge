@@ -30,12 +30,12 @@ import StatusColumn from './StatusColumn';
 import OrderCard from './OrderCard';
 import { generateId } from '../../utils/generateId';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
-import {
-  STATUS_OPTIONS,
-  DATE_RANGE_OPTIONS,
-  type OrderStatus ,
-  type SortKey,
-} from '../../constants';
+
+import { ORDER_STATUSES } from '../../constants/orderStatus';
+import { type OrderStatus } from '../../types/orderTypes';
+
+import { DATE_RANGE_OPTIONS } from '../../constants/filters';
+import { type SortKey } from '../../types/filterTypes';
 
 dayjs.extend(isBetween);
 
@@ -54,7 +54,6 @@ const OrderBoard = ({ openModal }: Props) => {
   }, [orders]);
 
   const [activeOrder, setActiveOrder] = useState<Order | null>(null);
-  const [statusFilter, setStatusFilter] = useState<'all' | OrderStatus >('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [dateRange, setDateRange] =
     useState<(typeof DATE_RANGE_OPTIONS)[number]>('all');
@@ -65,7 +64,7 @@ const OrderBoard = ({ openModal }: Props) => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 300);
-  const statuses = useMemo(() => STATUS_OPTIONS.slice(1), []);
+  const statuses = useMemo(() => ORDER_STATUSES.slice(1), []);
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -78,10 +77,6 @@ const OrderBoard = ({ openModal }: Props) => {
 
   const filteredOrders = useMemo(() => {
     let result = [...orders];
-
-    if (statusFilter !== 'all') {
-      result = result.filter((o) => o.status === statusFilter);
-    }
 
     if (debouncedSearchTerm) {
       const term = debouncedSearchTerm.toLowerCase();
@@ -144,10 +139,6 @@ const OrderBoard = ({ openModal }: Props) => {
             valA = a.customerName.toLowerCase();
             valB = b.customerName.toLowerCase();
             break;
-          case 'status':
-            valA = a.status;
-            valB = b.status;
-            break;
         }
 
         if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
@@ -159,7 +150,6 @@ const OrderBoard = ({ openModal }: Props) => {
     return result;
   }, [
     orders,
-    statusFilter,
     debouncedSearchTerm,
     dateRange,
     amountRange,
@@ -183,7 +173,7 @@ const OrderBoard = ({ openModal }: Props) => {
         orderDate: new Date().toISOString(),
         status: statuses[
           Math.floor(Math.random() * statuses.length)
-        ] as OrderStatus ,
+        ] as OrderStatus,
         items: [
           {
             id: `item_${Math.floor(Math.random() * 1000)}`,
@@ -221,7 +211,7 @@ const OrderBoard = ({ openModal }: Props) => {
       const randomOrder = current[Math.floor(Math.random() * current.length)];
       const newStatus = statuses[
         Math.floor(Math.random() * statuses.length)
-      ] as OrderStatus ;
+      ] as OrderStatus;
 
       if (randomOrder.status !== newStatus) {
         dispatch(
@@ -256,8 +246,6 @@ const OrderBoard = ({ openModal }: Props) => {
       <ExportCSVButton orders={filteredOrders} />
 
       <FilterPanel
-        status={statusFilter}
-        onStatusChange={setStatusFilter}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         dateRange={dateRange}
@@ -276,7 +264,6 @@ const OrderBoard = ({ openModal }: Props) => {
         color='secondary'
         sx={{ mb: 2 }}
         onClick={() => {
-          setStatusFilter('all');
           setSearchTerm('');
           setDateRange('all');
           setAmountRange([0, 2000]);
@@ -326,7 +313,7 @@ const OrderBoard = ({ openModal }: Props) => {
             dispatch(
               updateSingleOrderStatus({
                 id: fromId as string,
-                status: toStatus as OrderStatus ,
+                status: toStatus as OrderStatus,
               })
             );
             enqueueSnackbar(`Order ${fromId} moved to ${toStatus}`, {

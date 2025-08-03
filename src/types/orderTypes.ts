@@ -21,6 +21,15 @@ export type OrderStatus =
   | 'delivered'
   | 'cancelled';
 
+export type StatusColor =
+  | 'default'
+  | 'primary'
+  | 'secondary'
+  | 'error'
+  | 'info'
+  | 'success'
+  | 'warning';
+
 export interface Order {
   id: string;
   customerName: string;

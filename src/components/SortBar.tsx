@@ -3,7 +3,7 @@ import { Box, Button } from '@mui/material';
 import {
   SORT_OPTIONS as SortOptions,
   SORT_LABELS as sortLabels,
-} from '../constants';
+} from '../constants/sort';
 
 interface Props {
   sortBy: string;

@@ -3,21 +3,15 @@ import { Box, TextField, MenuItem, Slider, Typography } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { Dayjs } from 'dayjs';
 
-import {
-  STATUS_OPTIONS as statusOptions,
-  DATE_RANGE_OPTIONS as dateOptions,
-  type OrderStatus ,
-} from '../constants';
+import { DATE_RANGE_OPTIONS as dateOptions } from '../constants/filters';
+
+import type { DateRangeType } from '../types/filterTypes';
 
 interface Props {
-  status: string;
-  onStatusChange: Dispatch<SetStateAction<'all' | OrderStatus >>;
   searchTerm: string;
   onSearchChange: Dispatch<SetStateAction<string>>;
-  dateRange: 'all' | 'today' | 'week' | 'month' | 'custom';
-  onDateRangeChange: Dispatch<
-    SetStateAction<'all' | 'today' | 'week' | 'month' | 'custom'>
-  >;
+  dateRange: DateRangeType;
+  onDateRangeChange: Dispatch<SetStateAction<DateRangeType>>;
   amountRange: [number, number];
   onAmountChange: Dispatch<SetStateAction<[number, number]>>;
   customStartDate: Dayjs | null;
@@ -27,8 +21,6 @@ interface Props {
 }
 
 const FilterPanel = ({
-  status,
-  onStatusChange,
   searchTerm,
   onSearchChange,
   dateRange,
@@ -69,27 +61,9 @@ const FilterPanel = ({
 
       <TextField
         select
-        label='Status'
-        value={status}
-        onChange={(e) => onStatusChange(e.target.value as 'all' | OrderStatus )}
-        sx={{ minWidth: 150 }}
-      >
-        {statusOptions.map((option) => (
-          <MenuItem key={option} value={option}>
-            {option.charAt(0).toUpperCase() + option.slice(1)}
-          </MenuItem>
-        ))}
-      </TextField>
-
-      <TextField
-        select
         label='Date'
         value={dateRange}
-        onChange={(e) =>
-          onDateRangeChange(
-            e.target.value as 'all' | 'today' | 'week' | 'month' | 'custom'
-          )
-        }
+        onChange={(e) => onDateRangeChange(e.target.value as DateRangeType)}
         sx={{ minWidth: 150 }}
       >
         {dateOptions.map((option) => (

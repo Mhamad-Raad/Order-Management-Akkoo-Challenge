@@ -12,7 +12,7 @@ import { type Order } from '../../types/orderTypes';
 import { type RootState } from '../../store';
 import React from 'react';
 
-import { STATUS_COLORS } from '../../constants';
+import { STATUS_COLORS } from '../../constants/orderStatus';
 
 interface Props {
   order: Order;
