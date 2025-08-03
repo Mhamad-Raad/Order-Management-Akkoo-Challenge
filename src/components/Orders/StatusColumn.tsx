@@ -12,11 +12,11 @@ interface Props {
 }
 
 const StatusColumn = ({ status, orders, onOpenModal, activeOrder }: Props) => {
-  const { setNodeRef: setDropRef } = useDroppable({
+  const { setNodeRef: setDropRef, isOver } = useDroppable({
     id: status,
   });
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState<number>(1);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(orders.length / itemsPerPage);
 
@@ -40,7 +40,8 @@ const StatusColumn = ({ status, orders, onOpenModal, activeOrder }: Props) => {
         display: 'flex',
         flexDirection: 'column',
         gap: 2,
-        bgcolor: 'background.paper',
+        bgcolor: isOver ? 'action.hover' : 'background.paper',
+        transition: 'background-color 0.2s ease-in-out',
       }}
     >
       <Typography
