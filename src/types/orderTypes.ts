@@ -14,13 +14,20 @@ export interface ShippingAddress {
   country: string;
 }
 
+export type OrderStatus =
+  | 'pending'
+  | 'processing'
+  | 'shipped'
+  | 'delivered'
+  | 'cancelled';
+
 export interface Order {
   id: string;
   customerName: string;
   customerEmail: string;
   customerPhone: string;
   orderDate: string;
-  status: string;
+  status: OrderStatus;
   total: number;
   items: OrderItem[];
   shippingAddress: ShippingAddress;

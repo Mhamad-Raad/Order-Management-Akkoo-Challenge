@@ -10,23 +10,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toggleSelectOrder } from '../../store/OrderSlices/orderSlice';
 import { type Order } from '../../types/orderTypes';
 import { type RootState } from '../../store';
+import React from 'react';
 
-const statusColor = (status: string) => {
-  switch (status) {
-    case 'pending':
-      return 'warning';
-    case 'processing':
-      return 'info';
-    case 'shipped':
-      return 'primary';
-    case 'delivered':
-      return 'success';
-    case 'cancelled':
-      return 'error';
-    default:
-      return 'default';
-  }
-};
+import { STATUS_COLORS } from '../../constants';
 
 interface Props {
   order: Order;
@@ -62,6 +48,8 @@ const OrderCard = ({
   return (
     <Card
       variant='outlined'
+      role='checkbox'
+      aria-checked={isSelected}
       sx={{
         mb: 2,
         cursor: 'pointer',
@@ -79,7 +67,7 @@ const OrderCard = ({
           alignItems='center'
         >
           <Stack direction='row' alignItems='center' spacing={2}>
-            <Checkbox checked={isSelected} onMouseDown={handleCheckboxClick} />
+            <Checkbox checked={isSelected} onClick={handleCheckboxClick} />
             <div>
               <Typography variant='h6'>{order.customerName}</Typography>
               <Typography variant='body2' color='text.secondary'>
@@ -90,11 +78,14 @@ const OrderCard = ({
               </Typography>
             </div>
           </Stack>
-          <Chip label={order.status} color={statusColor(order.status)} />
+          <Chip
+            label={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+            color={STATUS_COLORS[order.status]}
+          />
         </Stack>
       </CardContent>
     </Card>
   );
 };
 
-export default OrderCard;
+export default React.memo(OrderCard);

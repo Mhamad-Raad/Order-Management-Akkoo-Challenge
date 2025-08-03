@@ -20,6 +20,7 @@ const DraggableOrderCard = ({ order, onOpenModal, ghost }: Props) => {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
+      role='button'
       sx={{ cursor: 'grab' }}
     >
       <OrderCard

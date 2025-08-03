@@ -23,3 +23,35 @@ export const SORT_LABELS: Record<string, string> = {
   customer: 'Customer',
   status: 'Status',
 };
+
+// order status colors and labels
+export type StatusColor =
+  | 'default'
+  | 'primary'
+  | 'secondary'
+  | 'error'
+  | 'info'
+  | 'success'
+  | 'warning';
+
+export const STATUS_COLORS: Record<
+  'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled',
+  StatusColor
+> = {
+  pending: 'warning',
+  processing: 'info',
+  shipped: 'primary',
+  delivered: 'success',
+  cancelled: 'error',
+};
+
+export const STATUS_LABELS: Record<
+  'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled',
+  string
+> = {
+  pending: 'Pending',
+  processing: 'Processing',
+  shipped: 'Shipped',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
+};
