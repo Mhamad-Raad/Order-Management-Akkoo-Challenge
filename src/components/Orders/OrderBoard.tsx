@@ -5,6 +5,7 @@ import {
   useSensor,
   useSensors,
   MouseSensor,
+  TouchSensor,
   DndContext,
   closestCenter,
   DragOverlay,
@@ -67,6 +68,12 @@ const OrderBoard = ({ openModal }: Props) => {
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
+      activationConstraint: {
+        delay: 150,
+        tolerance: 5,
+      },
+    }),
+    useSensor(TouchSensor, {
       activationConstraint: {
         delay: 150,
         tolerance: 5,

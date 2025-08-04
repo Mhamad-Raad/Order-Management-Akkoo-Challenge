@@ -1,7 +1,9 @@
 import { Paper, Typography, Pagination, Stack } from '@mui/material';
 import React, { useState, useMemo, useEffect } from 'react';
-import DraggableOrderCard from './DraggableOrderCard';
 import { useDroppable } from '@dnd-kit/core';
+
+import DraggableOrderCard from './DraggableOrderCard';
+
 import { type Order } from '../../types/orderTypes';
 
 interface Props {

@@ -5,6 +5,7 @@ import {
   Checkbox,
   Chip,
   Stack,
+  useTheme,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleSelectOrder } from '../../store/OrderSlices/orderSlice';
@@ -27,6 +28,7 @@ const OrderCard = ({
   isGhost = false,
   isDragging = false,
 }: Props) => {
+  const theme = useTheme();
   const dispatch = useDispatch();
   const selectedOrders = useSelector(
     (state: RootState) => state.orders.selectedOrders
@@ -55,32 +57,53 @@ const OrderCard = ({
         cursor: 'pointer',
         opacity: isGhost ? 0.3 : 1,
         transform: isDragging ? 'rotate(2deg)' : 'none',
-        boxShadow: isDragging ? 6 : 1,
+        boxShadow: isDragging ? 6 : 2,
+        borderRadius: 1,
         transition: 'all 0.2s ease-in-out',
+        '&:hover': {
+          boxShadow: 4,
+          backgroundColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.04)'
+              : 'rgba(0,0,0,0.03)',
+        },
       }}
       onClick={handleCardClick}
     >
-      <CardContent>
+      <CardContent sx={{ py: 2 }}>
         <Stack
           direction='row'
           justifyContent='space-between'
           alignItems='center'
+          spacing={2}
         >
-          <Stack direction='row' alignItems='center' spacing={2}>
-            <Checkbox checked={isSelected} onClick={handleCheckboxClick} />
-            <div>
-              <Typography variant='h6'>{order.customerName}</Typography>
-              <Typography variant='body2' color='text.secondary'>
+          <Stack direction='row' spacing={2} alignItems='center'>
+            <Checkbox
+              checked={isSelected}
+              onClick={handleCheckboxClick}
+              size='small'
+            />
+            <Stack spacing={0.5}>
+              <Typography variant='subtitle1' fontWeight={600}>
+                {order.customerName}
+              </Typography>
+              <Typography variant='caption' color='text.secondary'>
                 {new Date(order.orderDate).toLocaleString()}
               </Typography>
               <Typography variant='body2'>
                 Total: ${order.total.toFixed(2)}
               </Typography>
-            </div>
+            </Stack>
           </Stack>
+
           <Chip
             label={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
             color={STATUS_COLORS[order.status]}
+            size='small'
+            sx={{
+              fontWeight: 600,
+              textTransform: 'capitalize',
+            }}
           />
         </Stack>
       </CardContent>
