@@ -11,5 +11,9 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
+if (!firebaseConfig.apiKey) {
+  throw new Error('Missing Firebase API Key!');
+}
+
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
