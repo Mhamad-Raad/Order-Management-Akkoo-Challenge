@@ -13,9 +13,12 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  IconButton,
+  Grow,
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import { useDispatch } from 'react-redux';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, forwardRef } from 'react';
 import { useSnackbar } from 'notistack';
 import { updateSingleOrderStatus } from '../../store/OrderSlices/orderSlice';
 
@@ -31,6 +34,10 @@ interface Props {
   onClose: () => void;
   order: Order | null;
 }
+
+const Transition = forwardRef(function Transition(props: any, ref) {
+  return <Grow ref={ref} {...props} />;
+});
 
 const OrderModal = ({ open, onClose, order }: Props) => {
   const dispatch = useDispatch();
@@ -60,19 +67,38 @@ const OrderModal = ({ open, onClose, order }: Props) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
-      <DialogTitle>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth='sm'
+      fullWidth
+      TransitionComponent={Transition}
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          p: 1,
+        },
+      }}
+    >
+      <DialogTitle sx={{ pb: 0 }}>
         <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <Typography variant='h6'>{order.customerName}</Typography>
-          <Chip
-            label={STATUS_LABELS[localStatus as OrderStatus] || localStatus}
-            color={STATUS_COLORS[localStatus as OrderStatus]}
-            size='small'
-          />
+          <Typography variant='h6' fontWeight={600}>
+            {order.customerName}
+          </Typography>
+          <Box display='flex' alignItems='center' gap={1}>
+            <Chip
+              label={STATUS_LABELS[localStatus as OrderStatus] || localStatus}
+              color={STATUS_COLORS[localStatus as OrderStatus]}
+              size='small'
+            />
+            <IconButton onClick={onClose}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </Box>
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={{ mt: 2 }}>
         <Typography variant='body2' color='text.secondary' gutterBottom>
           Order ID: {order.id}
         </Typography>
@@ -91,7 +117,7 @@ const OrderModal = ({ open, onClose, order }: Props) => {
 
         <Divider sx={{ my: 2 }} />
 
-        <Typography variant='subtitle1' gutterBottom>
+        <Typography variant='subtitle1' fontWeight={600} gutterBottom>
           Update Status
         </Typography>
         <FormControl fullWidth sx={{ mb: 2 }}>
@@ -111,7 +137,7 @@ const OrderModal = ({ open, onClose, order }: Props) => {
 
         <Divider sx={{ my: 2 }} />
 
-        <Typography variant='subtitle1' gutterBottom>
+        <Typography variant='subtitle1' fontWeight={600} gutterBottom>
           Items
         </Typography>
         <List dense>
@@ -127,7 +153,7 @@ const OrderModal = ({ open, onClose, order }: Props) => {
 
         <Divider sx={{ my: 2 }} />
 
-        <Typography variant='subtitle1' gutterBottom>
+        <Typography variant='subtitle1' fontWeight={600} gutterBottom>
           Shipping Address
         </Typography>
         <Typography variant='body2'>
