@@ -46,6 +46,7 @@ const OrderBoard = ({ openModal }: Props) => {
   const { enqueueSnackbar } = useSnackbar();
   const orders = useSelector((state: RootState) => state.orders.orders);
 
+  // Ref to avoid closure in intervals
   const ordersRef = useRef(orders);
   useEffect(() => {
     ordersRef.current = orders;
@@ -157,6 +158,7 @@ const OrderBoard = ({ openModal }: Props) => {
     sortDirection,
   ]);
 
+  // Simulated Realtime Additions and Updates
   useEffect(() => {
     const addOrderInterval = setInterval(() => {
       const newOrder: Order = {

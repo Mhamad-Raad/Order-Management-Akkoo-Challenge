@@ -17,7 +17,7 @@ const StatusColumn = ({ status, orders, onOpenModal, activeOrder }: Props) => {
   });
 
   const [page, setPage] = useState<number>(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 4;
   const totalPages = Math.ceil(orders.length / itemsPerPage);
 
   const paginated = useMemo(() => {
@@ -36,7 +36,7 @@ const StatusColumn = ({ status, orders, onOpenModal, activeOrder }: Props) => {
       elevation={3}
       sx={{
         p: 2,
-        minHeight: '75vh',
+        height: '700px',
         display: 'flex',
         flexDirection: 'column',
         gap: 2,
