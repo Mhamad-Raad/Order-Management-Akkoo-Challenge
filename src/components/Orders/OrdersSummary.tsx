@@ -39,15 +39,7 @@ const OrderSummary = () => {
   return (
     <Grid container spacing={2} sx={{ mb: 4 }}>
       {summaryData.map((item) => (
-        <Grid
-          item
-          xs={12}
-          sm={6}
-          md={4}
-          lg={3}
-          key={item.label}
-          {...({ item: true } as any)}
-        >
+        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={item.label}>
           <Paper
             elevation={0}
             sx={{

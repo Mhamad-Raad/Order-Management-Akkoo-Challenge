@@ -81,6 +81,7 @@ const FilterPanel = ({
           fullWidth
           size='small'
           placeholder='Customer or Order ID'
+          name='search'
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           inputRef={searchRef}
@@ -96,6 +97,7 @@ const FilterPanel = ({
           select
           size='small'
           value={dateRange}
+          name='dateRange'
           onChange={(e) => onDateRangeChange(e.target.value as DateRangeType)}
         >
           {dateOptions.map((option) => (
@@ -116,6 +118,7 @@ const FilterPanel = ({
               slotProps={{
                 textField: { size: 'small', fullWidth: true },
               }}
+              name='startDate'
             />
             <DatePicker
               label='End'
@@ -124,6 +127,7 @@ const FilterPanel = ({
               slotProps={{
                 textField: { size: 'small', fullWidth: true },
               }}
+              name='endDate'
             />
           </Box>
         )}
@@ -146,6 +150,7 @@ const FilterPanel = ({
           min={0}
           max={2000}
           step={10}
+          name='amountRange'
         />
       </Box>
 

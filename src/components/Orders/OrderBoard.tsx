@@ -332,7 +332,6 @@ const OrderBoard = ({ openModal }: Props) => {
             const filtered = filteredOrders.filter((o) => o.status === status);
             return (
               <Grid
-                {...({ item: true } as any)}
                 key={status}
                 sx={{
                   minWidth: { xs: '100%', sm: '380px', md: '400px' },

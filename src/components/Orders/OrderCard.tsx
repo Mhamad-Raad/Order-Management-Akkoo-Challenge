@@ -82,6 +82,7 @@ const OrderCard = ({
               checked={isSelected}
               onClick={handleCheckboxClick}
               size='small'
+              name='selectOrder'
             />
             <Stack spacing={0.5}>
               <Typography variant='subtitle1' fontWeight={600}>
