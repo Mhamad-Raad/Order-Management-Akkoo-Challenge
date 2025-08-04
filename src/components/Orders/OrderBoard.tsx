@@ -27,6 +27,9 @@ import SortBar from '../SortBar';
 import BulkActions from '../BulkActions';
 import StatusColumn from './StatusColumn';
 import OrderCard from './OrderCard';
+
+import { useDragScroll } from '../../hooks/useDragScroll';
+
 import { generateId } from '../../utils/generateId';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 
@@ -43,6 +46,7 @@ interface Props {
 }
 
 const OrderBoard = ({ openModal }: Props) => {
+  const scrollRef = useDragScroll();
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const orders = useSelector((state: RootState) => state.orders.orders);
@@ -313,7 +317,16 @@ const OrderBoard = ({ openModal }: Props) => {
           container
           spacing={2}
           wrap='nowrap'
-          sx={{ overflowX: 'auto', pb: 2 }}
+          sx={{
+            overflowX: 'auto',
+            pb: 2,
+            cursor: 'grab',
+            '&:active': {
+              cursor: 'grabbing',
+            },
+            userSelect: 'none',
+          }}
+          ref={scrollRef}
         >
           {statuses.map((status) => {
             const filtered = filteredOrders.filter((o) => o.status === status);
