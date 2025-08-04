@@ -27,6 +27,7 @@ import SortBar from '../SortBar';
 import BulkActions from '../BulkActions';
 import StatusColumn from './StatusColumn';
 import OrderCard from './OrderCard';
+import EmptyState from '../EmptyState';
 
 import { useDragScroll } from '../../hooks/useDragScroll';
 
@@ -46,7 +47,7 @@ interface Props {
 }
 
 const OrderBoard = ({ openModal }: Props) => {
-  const scrollRef = useDragScroll();
+  const scrollRef = useDragScroll<HTMLDivElement>();
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const orders = useSelector((state: RootState) => state.orders.orders);
@@ -264,98 +265,106 @@ const OrderBoard = ({ openModal }: Props) => {
         onEndDateChange={setCustomEndDate}
       />
 
-      <SortBar
-        sortBy={sortBy}
-        sortDirection={sortDirection}
-        onSortChange={(key) => {
-          if (sortBy === key) {
-            setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-          } else {
-            setSortBy(key as SortKey);
-            setSortDirection('asc');
-          }
-        }}
-        onResetSort={() => {
-          setSortBy('');
-          setSortDirection('asc');
-        }}
-        orders={filteredOrders}
-      />
+      {filteredOrders.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <>
+          <SortBar
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            onSortChange={(key) => {
+              if (sortBy === key) {
+                setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+              } else {
+                setSortBy(key as SortKey);
+                setSortDirection('asc');
+              }
+            }}
+            onResetSort={() => {
+              setSortBy('');
+              setSortDirection('asc');
+            }}
+            orders={filteredOrders}
+          />
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={({ active }) => {
-          const dragged = orders.find((o) => o.id === active.id);
-          if (dragged) setActiveOrder(dragged);
-        }}
-        onDragEnd={({ active, over }) => {
-          setActiveOrder(null);
-          if (!over || !active) return;
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={({ active }) => {
+              const dragged = orders.find((o) => o.id === active.id);
+              if (dragged) setActiveOrder(dragged);
+            }}
+            onDragEnd={({ active, over }) => {
+              setActiveOrder(null);
+              if (!over || !active) return;
 
-          const fromId = active.id;
-          const toStatus = over.id;
-          if (
-            fromId &&
-            toStatus &&
-            active.data.current?.status &&
-            active.data.current.status !== toStatus
-          ) {
-            dispatch(
-              updateSingleOrderStatus({
-                id: fromId as string,
-                status: toStatus as OrderStatus,
-              })
-            );
-            enqueueSnackbar(`Order ${fromId} moved to ${toStatus}`, {
-              variant: 'success',
-            });
-          }
-        }}
-      >
-        <Grid
-          container
-          spacing={2}
-          wrap='nowrap'
-          sx={{
-            overflowX: 'auto',
-            pb: 2,
-            cursor: 'grab',
-            '&:active': {
-              cursor: 'grabbing',
-            },
-            userSelect: 'none',
-          }}
-          ref={scrollRef}
-        >
-          {statuses.map((status) => {
-            const filtered = filteredOrders.filter((o) => o.status === status);
-            return (
-              <Grid
-                key={status}
-                sx={{
-                  minWidth: { xs: '100%', sm: '380px', md: '400px' },
-                  flexShrink: 0,
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                <BulkActions orders={filtered} />
-                <StatusColumn
-                  status={status}
-                  orders={filtered}
-                  onOpenModal={handleOpenModal}
-                  activeOrder={activeOrder}
-                />
-              </Grid>
-            );
-          })}
-        </Grid>
+              const fromId = active.id;
+              const toStatus = over.id;
+              if (
+                fromId &&
+                toStatus &&
+                active.data.current?.status &&
+                active.data.current.status !== toStatus
+              ) {
+                dispatch(
+                  updateSingleOrderStatus({
+                    id: fromId as string,
+                    status: toStatus as OrderStatus,
+                  })
+                );
+                enqueueSnackbar(`Order ${fromId} moved to ${toStatus}`, {
+                  variant: 'success',
+                });
+              }
+            }}
+          >
+            <Grid
+              container
+              spacing={2}
+              wrap='nowrap'
+              sx={{
+                overflowX: 'auto',
+                pb: 2,
+                cursor: 'grab',
+                '&:active': {
+                  cursor: 'grabbing',
+                },
+                userSelect: 'none',
+              }}
+              ref={scrollRef}
+            >
+              {statuses.map((status) => {
+                const filtered = filteredOrders.filter(
+                  (o) => o.status === status
+                );
+                return (
+                  <Grid
+                    key={status}
+                    sx={{
+                      minWidth: { xs: '100%', sm: '380px', md: '400px' },
+                      flexShrink: 0,
+                      display: 'flex',
+                      flexDirection: 'column',
+                    }}
+                  >
+                    <BulkActions orders={filtered} />
+                    <StatusColumn
+                      status={status}
+                      orders={filtered}
+                      onOpenModal={handleOpenModal}
+                      activeOrder={activeOrder}
+                    />
+                  </Grid>
+                );
+              })}
+            </Grid>
 
-        <DragOverlay>
-          {activeOrder && <OrderCard order={activeOrder} isDragging />}
-        </DragOverlay>
-      </DndContext>
+            <DragOverlay>
+              {activeOrder && <OrderCard order={activeOrder} isDragging />}
+            </DragOverlay>
+          </DndContext>
+        </>
+      )}
     </>
   );
 };

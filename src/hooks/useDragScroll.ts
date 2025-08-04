@@ -1,48 +1,57 @@
-import { useRef, useEffect } from 'react';
+import { useCallback } from 'react';
 
-export const useDragScroll = () => {
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+export function useDragScroll<T extends HTMLElement>() {
+  const attachListeners = (element: T | null) => {
+    if (!element) return;
 
     let isDown = false;
-    let startX = 0;
-    let scrollLeft = 0;
+    let startX: number;
+    let scrollLeft: number;
 
-    const mouseDown = (e: MouseEvent) => {
+    const handleMouseDown = (e: MouseEvent) => {
       isDown = true;
-      startX = e.pageX - el.offsetLeft;
-      scrollLeft = el.scrollLeft;
-      el.classList.add('dragging');
+      element.classList.add('dragging');
+      startX = e.pageX - element.offsetLeft;
+      scrollLeft = element.scrollLeft;
     };
 
-    const mouseLeaveOrUp = () => {
+    const handleMouseLeave = () => {
       isDown = false;
-      el.classList.remove('dragging');
+      element.classList.remove('dragging');
     };
 
-    const mouseMove = (e: MouseEvent) => {
+    const handleMouseUp = () => {
+      isDown = false;
+      element.classList.remove('dragging');
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
       if (!isDown) return;
       e.preventDefault();
-      const x = e.pageX - el.offsetLeft;
-      const walk = (x - startX) * 1.5;
-      el.scrollLeft = scrollLeft - walk;
+      const x = e.pageX - element.offsetLeft;
+      const walk = (x - startX) * 1.2;
+      element.scrollLeft = scrollLeft - walk;
     };
 
-    el.addEventListener('mousedown', mouseDown);
-    el.addEventListener('mouseleave', mouseLeaveOrUp);
-    el.addEventListener('mouseup', mouseLeaveOrUp);
-    el.addEventListener('mousemove', mouseMove);
+    element.addEventListener('mousedown', handleMouseDown);
+    element.addEventListener('mouseleave', handleMouseLeave);
+    element.addEventListener('mouseup', handleMouseUp);
+    element.addEventListener('mousemove', handleMouseMove);
 
+    // Clean up when DOM element unmounts
     return () => {
-      el.removeEventListener('mousedown', mouseDown);
-      el.removeEventListener('mouseleave', mouseLeaveOrUp);
-      el.removeEventListener('mouseup', mouseLeaveOrUp);
-      el.removeEventListener('mousemove', mouseMove);
+      element.removeEventListener('mousedown', handleMouseDown);
+      element.removeEventListener('mouseleave', handleMouseLeave);
+      element.removeEventListener('mouseup', handleMouseUp);
+      element.removeEventListener('mousemove', handleMouseMove);
     };
+  };
+
+  const ref = useCallback((node: T | null) => {
+    if (node) {
+      attachListeners(node);
+    }
   }, []);
 
   return ref;
-};
+}
