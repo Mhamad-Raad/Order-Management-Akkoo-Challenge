@@ -31,6 +31,17 @@ export const getAppTheme = (mode: 'light' | 'dark') => {
     components: {
       MuiCssBaseline: {
         styleOverrides: {
+          '::-webkit-scrollbar': { width: '8px', height: '8px' },
+          '::-webkit-scrollbar-thumb': {
+            backgroundColor: isDark ? '#8e44ad' : '#1976d2',
+            borderRadius: '8px',
+          },
+          '::-webkit-scrollbar-track': { background: 'transparent' },
+          '*': {
+            scrollbarColor: `${isDark ? '#8e44ad' : '#1976d2'} transparent`,
+            scrollbarWidth: 'thin',
+          },
+
           body: {
             background: isDark
               ? '#121212'
