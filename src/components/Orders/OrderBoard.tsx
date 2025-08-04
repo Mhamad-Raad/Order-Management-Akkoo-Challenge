@@ -21,7 +21,6 @@ import {
 } from '../../store/OrderSlices/orderSlice';
 
 import OrderSummary from './OrdersSummary';
-import ExportCSVButton from '../ExportCSVButton';
 import FilterPanel from '../FilterPanel';
 import SortBar from '../SortBar';
 import BulkActions from '../BulkActions';
@@ -238,7 +237,6 @@ const OrderBoard = ({ openModal }: Props) => {
   return (
     <>
       <OrderSummary />
-      <ExportCSVButton orders={filteredOrders} />
 
       <FilterPanel
         searchTerm={searchTerm}
@@ -268,6 +266,7 @@ const OrderBoard = ({ openModal }: Props) => {
           setSortBy('');
           setSortDirection('asc');
         }}
+        orders={filteredOrders}
       />
 
       <DndContext

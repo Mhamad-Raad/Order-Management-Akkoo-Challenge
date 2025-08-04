@@ -5,11 +5,14 @@ import {
   Tooltip,
   Typography,
   useTheme,
+  Stack,
 } from '@mui/material';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
+import ExportCSVButton from './ExportCSVButton';
+import { type Order } from '../types/orderTypes';
 import {
   SORT_OPTIONS as SortOptions,
   SORT_LABELS as sortLabels,
@@ -20,6 +23,7 @@ interface Props {
   sortDirection: 'asc' | 'desc';
   onSortChange: (key: string) => void;
   onResetSort: () => void;
+  orders: Order[];
 }
 
 const SortBar = ({
@@ -27,6 +31,7 @@ const SortBar = ({
   sortDirection,
   onSortChange,
   onResetSort,
+  orders,
 }: Props) => {
   const theme = useTheme();
 
@@ -38,16 +43,17 @@ const SortBar = ({
       justifyContent='space-between'
       gap={2}
       mb={4}
-      py={1}
-      px={1}
+      py={2}
+      px={2}
       sx={{
         backgroundColor: theme.palette.background.paper,
         border: `1px solid ${theme.palette.divider}`,
-        borderRadius: 1,
+        borderRadius: 2,
       }}
     >
-      <Box display='flex' gap={1.5} flexWrap='wrap' alignItems='center'>
-        <Typography variant='subtitle2' color='text.secondary' fontWeight={500}>
+      {/* Sort Controls */}
+      <Box display='flex' flexWrap='wrap' gap={1.5} alignItems='center'>
+        <Typography variant='subtitle1' color='text.secondary' fontWeight={600}>
           Sort by:
         </Typography>
 
@@ -65,39 +71,52 @@ const SortBar = ({
               variant={isActive ? 'filled' : 'outlined'}
               color={isActive ? 'primary' : 'default'}
               label={
-                <Box display='flex' alignItems='center' gap={0.5}>
-                  <span>{sortLabels[key] ?? key}</span>
-                  {isActive && <Icon fontSize='small' />}
+                <Box display='flex' alignItems='center' gap={0.75}>
+                  <Typography
+                    fontWeight={600}
+                    fontSize='1rem'
+                    sx={{ textTransform: 'capitalize' }}
+                  >
+                    {sortLabels[key] ?? key}
+                  </Typography>
+                  {isActive && <Icon fontSize='medium' />}
                 </Box>
               }
               onClick={() => onSortChange(key)}
               sx={{
-                borderRadius: 2,
-                fontWeight: 500,
-                px: 1.5,
+                px: 2.5,
+                py: 1.5,
+                height: '40px',
+                borderRadius: 3,
+                fontSize: '1rem',
               }}
             />
           );
         })}
       </Box>
 
-      <Tooltip title='Reset Sorting'>
-        <IconButton
-          size='small'
-          onClick={onResetSort}
-          sx={{
-            color: theme.palette.error.main,
-            '&:hover': {
-              backgroundColor:
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255, 0, 0, 0.1)'
-                  : 'rgba(255, 0, 0, 0.05)',
-            },
-          }}
-        >
-          <RestartAltIcon fontSize='small' />
-        </IconButton>
-      </Tooltip>
+      {/* Right-side controls */}
+      <Stack direction='row' spacing={1} alignItems='center'>
+        <Tooltip title='Reset Sorting'>
+          <IconButton
+            size='small'
+            onClick={onResetSort}
+            sx={{
+              color: theme.palette.error.main,
+              '&:hover': {
+                backgroundColor:
+                  theme.palette.mode === 'dark'
+                    ? 'rgba(255, 0, 0, 0.1)'
+                    : 'rgba(255, 0, 0, 0.05)',
+              },
+            }}
+          >
+            <RestartAltIcon fontSize='small' />
+          </IconButton>
+        </Tooltip>
+
+        <ExportCSVButton orders={orders} />
+      </Stack>
     </Box>
   );
 };
